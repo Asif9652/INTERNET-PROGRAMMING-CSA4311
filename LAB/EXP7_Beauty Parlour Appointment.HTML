@@ -1,0 +1,290 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Glow Studio | Beauty Parlour</title>
+<style>
+:root{--pink:#d94f87;--dark:#382438;--bg:#fff7fa;--muted:#806d7c;--line:#f0dce6;--green:#168566}
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:var(--bg);color:var(--dark)}
+header{display:flex;justify-content:space-between;align-items:center;gap:15px;flex-wrap:wrap;background:white;padding:17px 5%;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:4}
+.logo{font-size:25px;font-weight:800;color:var(--pink)}
+button{border:0;border-radius:8px;padding:10px 14px;background:var(--pink);color:white;font-weight:bold;cursor:pointer;margin:3px}
+button:hover{opacity:.85}
+.secondary{background:#f8e4ed;color:var(--dark)}
+.danger{background:#c73e53}
+input,select,textarea{width:100%;padding:11px;border:1px solid var(--line);border-radius:8px;margin:5px 0 12px;font:inherit;background:white}
+label{font-size:13px;font-weight:bold}
+.container{max-width:1200px;margin:auto;padding:24px}
+.hidden{display:none!important}
+.panel{background:white;padding:21px;border:1px solid var(--line);border-radius:14px;margin-bottom:20px}
+.hero{background:linear-gradient(120deg,#f7dce8,#fff0dd);padding:42px;border-radius:18px;display:flex;justify-content:space-between;align-items:center;gap:20px;margin-bottom:25px}
+.hero h1{font-size:clamp(30px,5vw,49px);margin:10px 0}
+.hero p{color:var(--muted);line-height:1.7}
+.hero-art{font-size:100px}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:17px}
+.service{background:white;border:1px solid var(--line);border-radius:13px;overflow:hidden}
+.service img{width:100%;height:190px;object-fit:cover;background:#f5e4eb}
+.service-body{padding:17px}
+.service h3{margin:8px 0}
+.price{font-size:21px;color:var(--pink);font-weight:bold}
+.muted{color:var(--muted);font-size:13px;line-height:1.6}
+.tag{display:inline-block;padding:5px 9px;background:#f9e6ee;border-radius:20px;font-size:11px}
+nav{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:20px}
+nav button{background:var(--dark)}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-bottom:20px}
+.stat{background:white;border:1px solid var(--line);border-radius:12px;padding:18px}
+.stat strong{display:block;font-size:25px;margin-top:9px}
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:650px}
+th,td{text-align:left;padding:12px;border-bottom:1px solid var(--line);font-size:13px}
+th{background:#fff0f5}
+.login{max-width:450px;margin:35px auto}
+.calendar{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px}
+.day,.weekday{padding:10px 3px;text-align:center;border-radius:7px}
+.weekday{font-size:12px;font-weight:bold;color:var(--muted)}
+.day{background:#fff0f5;min-height:47px;cursor:pointer;border:1px solid transparent}
+.day:hover,.day.selected{border-color:var(--pink);background:#f5cddd}
+.day.disabled{background:#f4f4f4;color:#aaa;cursor:not-allowed}
+.modal-bg{position:fixed;inset:0;background:#2c172477;z-index:10;display:grid;place-items:center;padding:15px}
+.modal{background:white;padding:23px;border-radius:15px;width:min(600px,100%);max-height:90vh;overflow:auto}
+.modal-head{display:flex;justify-content:space-between;align-items:center}
+footer{text-align:center;padding:25px;color:var(--muted)}
+@media(max-width:850px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:560px){.container{padding:13px}.grid{grid-template-columns:1fr}.hero{padding:22px}.hero-art{font-size:55px}header{padding:14px}.calendar{gap:2px}.day{min-height:38px;padding:8px 1px;font-size:12px}}
+</style>
+</head>
+<body>
+<header>
+ <div class="logo">✿ Glow Studio</div>
+ <div id="headerText">Your beauty, our passion</div>
+ <div><button id="loginBtn" onclick="showLogin()">Login</button><button id="logoutBtn" class="hidden" onclick="logout()">Logout</button></div>
+</header>
+
+<div id="loginPage" class="container">
+ <div class="panel login">
+  <h1>Welcome to Glow Studio ✨</h1>
+  <p class="muted">Book your beauty appointment in a few simple steps.</p>
+  <label>Email</label><input id="loginEmail" type="email" placeholder="Enter email">
+  <label>Password</label><input id="loginPassword" type="password" placeholder="Enter password">
+  <label>Login as</label>
+  <select id="loginRole"><option value="customer">Customer</option><option value="admin">Salon Manager</option><option value="staff">Staff Member</option></select>
+  <button style="width:100%" onclick="login()">Login</button>
+  <hr>
+  <h3>Create Customer Account</h3>
+  <input id="regName" placeholder="Full name">
+  <input id="regEmail" type="email" placeholder="Email address">
+  <input id="regPass" type="password" placeholder="Password (minimum 6 characters)">
+  <input id="regPhone" placeholder="Phone number">
+  <button style="width:100%" onclick="register()">Register</button>
+  <p class="muted">Manager: admin@glow.com / admin123</p>
+  <p class="muted">Staff: staff@glow.com / staff123</p>
+  <p class="muted">Customer: customer@glow.com / glow123</p>
+ </div>
+</div>
+
+<div id="app" class="container hidden">
+ <nav id="navigation"></nav>
+ <div id="content"></div>
+</div>
+
+<div id="modalRoot"></div>
+<footer>© 2026 Glow Studio · Beauty Parlour Appointment System</footer>
+
+<script>
+const KEY="glowStudioData";
+const initial={
+ users:[
+  {id:"a1",name:"Salon Manager",email:"admin@glow.com",password:"admin123",phone:"",role:"admin"},
+  {id:"s1",name:"Beauty Staff",email:"staff@glow.com",password:"staff123",phone:"",role:"staff"},
+  {id:"c1",name:"Demo Customer",email:"customer@glow.com",password:"glow123",phone:"9876543210",role:"customer"}
+ ],
+ services:[
+  {id:1,name:"Hair Styling",category:"Hair",price:500,duration:45,description:"Professional hair styling for every occasion.",image:"https://images.unsplash.com/photo-1562322140-8baeececf3df?auto=format&fit=crop&w=700&q=80"},
+  {id:2,name:"Facial Treatment",category:"Skin",price:900,duration:60,description:"A relaxing facial treatment for glowing skin.",image:"https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?auto=format&fit=crop&w=700&q=80"},
+  {id:3,name:"Manicure",category:"Nails",price:350,duration:30,description:"Nail shaping, grooming and polish.",image:"https://images.unsplash.com/photo-1604654894610-df63bc536371?auto=format&fit=crop&w=700&q=80"},
+  {id:4,name:"Bridal Makeup",category:"Makeup",price:5000,duration:120,description:"Professional bridal makeup for your special day.",image:"https://images.unsplash.com/photo-1487412947147-5cebf100ffc2?auto=format&fit=crop&w=700&q=80"},
+  {id:5,name:"Hair Spa",category:"Hair",price:1200,duration:60,description:"Nourishing spa treatment for healthy-looking hair.",image:"https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f?auto=format&fit=crop&w=700&q=80"},
+  {id:6,name:"Pedicure",category:"Nails",price:600,duration:45,description:"Relaxing foot care, exfoliation and nail grooming.",image:"https://images.unsplash.com/photo-1519014816548-bf5fe059798b?auto=format&fit=crop&w=700&q=80"}
+ ],
+ stylists:["Ananya","Priya","Meera"],
+ appointments:[],
+ feedback:[],
+ blocked:[]
+};
+let db;
+try{db=JSON.parse(localStorage.getItem(KEY))||JSON.parse(JSON.stringify(initial))}
+catch(e){db=JSON.parse(JSON.stringify(initial))}
+let current=null,page="home",selectedDate="",selectedService=1,selectedStylist="Ananya",selectedTime="10:00",filterCategory="All";
+function save(){localStorage.setItem(KEY,JSON.stringify(db))}
+function safe(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+function money(n){return "₹"+Number(n).toLocaleString("en-IN")}
+function notify(s){alert(s)}
+function showLogin(){document.getElementById("loginPage").classList.remove("hidden");document.getElementById("app").classList.add("hidden");document.getElementById("loginBtn").classList.remove("hidden");document.getElementById("logoutBtn").classList.add("hidden")}
+function login(){
+ let email=document.getElementById("loginEmail").value.trim().toLowerCase(),pass=document.getElementById("loginPassword").value,role=document.getElementById("loginRole").value;
+ let found=db.users.find(u=>u.email.toLowerCase()===email&&u.password===pass&&u.role===role);
+ if(!found){notify("Invalid login credentials or role.");return}
+ current=found;enter();
+}
+function register(){
+ let name=document.getElementById("regName").value.trim(),email=document.getElementById("regEmail").value.trim().toLowerCase(),password=document.getElementById("regPass").value,phone=document.getElementById("regPhone").value.trim();
+ if(!name||!email||password.length<6||!phone){notify("Fill all fields. Password must contain at least 6 characters.");return}
+ if(db.users.some(u=>u.email.toLowerCase()===email)){notify("Email already registered.");return}
+ current={id:"u"+Date.now(),name,email,password,phone,role:"customer"};
+ db.users.push(current);save();enter();notify("Account created successfully.");
+}
+function enter(){
+ document.getElementById("loginPage").classList.add("hidden");document.getElementById("app").classList.remove("hidden");
+ document.getElementById("loginBtn").classList.add("hidden");document.getElementById("logoutBtn").classList.remove("hidden");
+ document.getElementById("headerText").textContent="Welcome, "+current.name;
+ buildNav();render("home");
+}
+function logout(){current=null;showLogin();document.getElementById("headerText").textContent="Your beauty, our passion"}
+function buildNav(){
+ let links=current.role==="admin"||current.role==="staff"
+ ?[["home","Dashboard"],["calendar","Reservations Calendar"],["appointments","Manage Appointments"],["services","Manage Services"],["stylists","Staff Schedules"],["feedback","Customer Feedback"]]
+ :[["home","Home"],["services","Beauty Services"],["book","Book Appointment"],["myappointments","My Appointments"],["profile","My Account"],["feedback","Feedback"]];
+ document.getElementById("navigation").innerHTML=links.map(x=>`<button onclick="render('${x[0]}')">${x[1]}</button>`).join("");
+}
+function render(p){
+ page=p;let pages={home,services,book,calendar,appointments,myappointments,profile,servicesAdmin:services,stylists,feedback};
+ if(p==="services"&&(current.role==="admin"||current.role==="staff"))pages.services=manageServices;
+ document.getElementById("content").innerHTML=(pages[p]||home)();
+}
+function heading(t,d){return `<div class="panel"><h1>${t}</h1><p class="muted">${d}</p></div>`}
+function home(){
+ let mine=db.appointments.filter(a=>a.userId===current.id&&a.status!=="Cancelled");
+ let upcoming=db.appointments.filter(a=>a.status!=="Cancelled"&&new Date(a.date+"T"+a.time)>=new Date());
+ let manager=current.role!=="customer";
+ return `<div class="hero"><div><span class="tag">YOUR PERSONAL BEAUTY SPACE</span><h1>Feel beautiful.<br>Feel confident.</h1><p>Discover salon services and reserve a time that works for you.</p><button onclick="render('${manager?"calendar":"book"}')">${manager?"View Reservations":"Book an Appointment"} →</button></div><div class="hero-art">💆🏻‍♀️✨</div></div>
+ <div class="stats"><div class="stat">Our Services<strong>${db.services.length}</strong></div><div class="stat">${manager?"Upcoming Appointments":"My Appointments"}<strong>${manager?upcoming.length:mine.length}</strong></div><div class="stat">Our Stylists<strong>${db.stylists.length}</strong></div><div class="stat">Customer Feedback<strong>${db.feedback.length}</strong></div></div>
+ <h2>Popular Services</h2>${serviceGrid(db.services.slice(0,3),!manager)}`;
+}
+function serviceGrid(list,allowBook=true){
+ if(!list.length)return '<div class="panel">No services available.</div>';
+ return `<div class="grid">${list.map(s=>`<div class="service"><img src="${safe(s.image)}" alt="${safe(s.name)}" onerror="this.onerror=null;this.src='https://placehold.co/600x400?text=Salon+Service'"><div class="service-body"><span class="tag">${safe(s.category)} · ${s.duration} min</span><h3>${safe(s.name)}</h3><p class="muted">${safe(s.description)}</p><div class="price">${money(s.price)}</div>${allowBook?`<button onclick="startBooking(${s.id})">Book Now</button>`:""}</div></div>`).join("")}</div>`;
+}
+function services(){
+ let cats=[...new Set(db.services.map(s=>s.category))];
+ return heading("Beauty Services","Explore treatments, prices and durations.")+
+ `<div class="panel"><label>Filter by category</label><select onchange="filterCategory=this.value;render('services')"><option>All</option>${cats.map(c=>`<option ${filterCategory===c?"selected":""}>${safe(c)}</option>`).join("")}</select></div>`+
+ serviceGrid(db.services.filter(s=>filterCategory==="All"||s.category===filterCategory),current.role==="customer");
+}
+function startBooking(id){selectedService=id;selectedDate="";selectedTime="10:00";selectedStylist=db.stylists[0]||"Ananya";render("book")}
+function book(){
+ if(current.role!=="customer")return heading("Booking","Customer accounts can book appointments.");
+ let s=db.services.find(x=>x.id===selectedService)||db.services[0];
+ return heading("Book an Appointment","Choose your service, stylist, date, time and payment preference.")+
+ `<div class="panel"><form onsubmit="confirmBooking(event)">
+ <label>Beauty Service</label><select id="serviceSelect" name="service" onchange="selectedService=Number(this.value);render('book')">${db.services.map(x=>`<option value="${x.id}" ${x.id===s.id?"selected":""}>${safe(x.name)} — ${money(x.price)}</option>`).join("")}</select>
+ <p class="muted">Duration: ${s.duration} minutes · Price: ${money(s.price)}</p>
+ <label>Choose Stylist</label><select name="stylist" id="stylistSelect" onchange="selectedStylist=this.value">${db.stylists.map(x=>`<option ${x===selectedStylist?"selected":""}>${safe(x)}</option>`).join("")}</select>
+ <label>Appointment Date</label><input type="date" name="date" min="${new Date().toISOString().slice(0,10)}" value="${safe(selectedDate)}" onchange="selectedDate=this.value;showSlots()" required>
+ <label>Available Time</label><div id="slots">${slotButtons()}</div>
+ <input type="hidden" name="time" id="selectedTime" value="${safe(selectedTime)}">
+ <label>Payment option</label><select name="payment"><option value="Full">Full payment (demo)</option><option value="Deposit">20% deposit (demo)</option><option value="Salon">Pay at salon</option></select>
+ <button>Confirm Appointment</button></form>
+ <p class="muted">Demo only: no real payment will be collected.</p></div>`;
+}
+function slotButtons(){
+ let times=["09:00","10:00","11:00","12:00","13:00","14:00","15:00","16:00","17:00","18:00"];
+ return times.map(t=>{let busy=selectedDate&&db.appointments.some(a=>a.date===selectedDate&&a.time===t&&a.stylist===selectedStylist&&a.status!=="Cancelled")||selectedDate&&db.blocked.some(b=>b.date===selectedDate&&b.time===t&&b.stylist===selectedStylist);return `<button type="button" class="${selectedTime===t?"":"secondary"}" ${busy?"disabled":""} onclick="selectTime('${t}')">${t}${busy?" · Busy":""}</button>`}).join("");
+}
+function selectTime(t){selectedTime=t;let el=document.getElementById("selectedTime");if(el)el.value=t;showSlots()}
+function showSlots(){let el=document.getElementById("slots");if(el)el.innerHTML=slotButtons();let t=document.getElementById("selectedTime");if(t)t.value=selectedTime}
+function confirmBooking(e){
+ e.preventDefault();let f=new FormData(e.target),service=db.services.find(s=>s.id===Number(f.get("service"))),date=f.get("date"),time=f.get("time"),stylist=f.get("stylist");
+ if(!date||date<new Date().toISOString().slice(0,10)){notify("Choose a valid future date.");return}
+ if(!time){notify("Select a time slot.");return}
+ let busy=db.appointments.some(a=>a.date===date&&a.time===time&&a.stylist===stylist&&a.status!=="Cancelled")||db.blocked.some(b=>b.date===date&&b.time===time&&b.stylist===stylist);
+ if(busy){notify("That slot is unavailable. Choose another time.");return}
+ let payment=f.get("payment"),amount=payment==="Deposit"?service.price*.2:payment==="Full"?service.price:0;
+ db.appointments.push({id:"AP"+Date.now(),userId:current.id,serviceId:service.id,service:service.name,stylist,date,time,price:service.price,payment,paid:amount,status:"Booked",created:new Date().toISOString()});
+ save();notify("Appointment booked successfully!");render("myappointments");
+}
+function calendar(){
+ let month=selectedDate?new Date(selectedDate+"T12:00:00"):new Date();
+ let y=month.getFullYear(),m=month.getMonth(),first=new Date(y,m,1).getDay(),days=new Date(y,m+1,0).getDate();
+ return heading("Reservations Calendar","Select a date to view appointments. Use Manage Appointments to add or update bookings.")+
+ `<div class="panel"><label>Choose month</label><input type="month" value="${y}-${String(m+1).padStart(2,"0")}" onchange="selectedDate=this.value+'-01';render('calendar')">
+ <div class="calendar">${["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].map(x=>`<div class="weekday">${x}</div>`).join("")}${Array(first).fill("<div></div>").join("")}${Array.from({length:days},(_,i)=>{let d=`${y}-${String(m+1).padStart(2,"0")}-${String(i+1).padStart(2,"0")}`,count=db.appointments.filter(a=>a.date===d&&a.status!=="Cancelled").length;return `<div class="day ${selectedDate===d?"selected":""}" onclick="selectedDate='${d}';render('calendar')">${i+1}${count?`<br><small>● ${count}</small>`:""}</div>`}).join("")}</div></div>
+ <div class="panel"><h2>Appointments for ${safe(selectedDate||"Select a date")}</h2>${selectedDate?appointmentTable(db.appointments.filter(a=>a.date===selectedDate),true):"<p>Select a day on the calendar.</p>"}</div>
+ <div class="panel"><h2>Lock / Block a Time Slot</h2><form onsubmit="blockSlot(event)"><label>Date</label><input type="date" name="date" value="${safe(selectedDate)}" required><label>Stylist</label><select name="stylist">${db.stylists.map(s=>`<option>${safe(s)}</option>`).join("")}</select><label>Time</label><select name="time">${["09:00","10:00","11:00","12:00","13:00","14:00","15:00","16:00","17:00","18:00"].map(t=>`<option>${t}</option>`).join("")}</select><button>Block Slot</button></form></div>`;
+}
+function blockSlot(e){e.preventDefault();let f=new FormData(e.target),b={date:f.get("date"),stylist:f.get("stylist"),time:f.get("time")};if(db.blocked.some(x=>x.date===b.date&&x.time===b.time&&x.stylist===b.stylist)){notify("Slot is already blocked.");return}if(db.appointments.some(a=>a.date===b.date&&a.time===b.time&&a.stylist===b.stylist&&a.status!=="Cancelled")){notify("An appointment already occupies this slot.");return}db.blocked.push(b);save();notify("Time slot blocked.");render("calendar")}
+function appointments(){
+ let list=db.appointments.slice().sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time));
+ return heading("Manage Appointments","Review reservations, add bookings, update status, or contact customers.")+
+ `<div class="panel"><button onclick="manualBooking()">＋ Add Reservation</button><div style="height:12px"></div>${appointmentTable(list,true)}</div>`;
+}
+function appointmentTable(list,admin=false){
+ if(!list.length)return "<p>No appointments found.</p>";
+ return `<div class="table-wrap"><table><tr><th>Customer</th><th>Service</th><th>Stylist</th><th>Date / Time</th><th>Payment</th><th>Status</th>${admin?"<th>Actions</th>":""}</tr>${list.map(a=>{let u=db.users.find(x=>x.id===a.userId)||{name:"Customer",phone:""};return `<tr><td>${safe(u.name)}<br><small>${safe(u.phone||"")}</small></td><td>${safe(a.service)}</td><td>${safe(a.stylist)}</td><td>${safe(a.date)}<br>${safe(a.time)}</td><td>${safe(a.payment)}<br>${money(a.paid||0)} paid</td><td>${safe(a.status)}</td>${admin?`<td><button onclick="editAppointment('${a.id}')">Edit</button><button class="danger" onclick="cancelAppointment('${a.id}')">Cancel</button>${u.phone?`<button class="secondary" onclick="contactCustomer('${u.phone}')">Call / SMS</button>`:""}</td>`:""}</tr>`}).join("")}</table></div>`;
+}
+function myappointments(){
+ return heading("My Appointments","View upcoming bookings and appointment history.")+
+ `<div class="panel"><h2>Upcoming / Active</h2>${appointmentTable(db.appointments.filter(a=>a.userId===current.id&&a.status!=="Cancelled"&&a.status!=="Completed"),false)}</div>
+ <div class="panel"><h2>Appointment History</h2>${appointmentTable(db.appointments.filter(a=>a.userId===current.id&&(a.status==="Cancelled"||a.status==="Completed")),false)}</div>
+ <div class="panel"><h2>Reschedule or Cancel</h2><p class="muted">Use the buttons below to manage your active reservations.</p>${db.appointments.filter(a=>a.userId===current.id&&a.status!=="Cancelled"&&a.status!=="Completed").map(a=>`<div style="border-bottom:1px solid var(--line);padding:10px 0"><b>${safe(a.service)}</b> — ${safe(a.date)} ${safe(a.time)}<br><button onclick="reschedule('${a.id}')">Reschedule</button><button class="danger" onclick="cancelAppointment('${a.id}')">Cancel</button></div>`).join("")}</div>`;
+}
+function manualBooking(){
+ let customers=db.users.filter(u=>u.role==="customer");
+ if(!customers.length){notify("No customer accounts exist.");return}
+ let email=prompt("Enter customer email:\n"+customers.map(u=>u.email).join("\n"));if(!email)return;
+ let u=customers.find(x=>x.email.toLowerCase()===email.toLowerCase());if(!u){notify("Customer not found.");return}
+ let s=db.services[0],date=prompt("Appointment date (YYYY-MM-DD):");if(!date)return;
+ let time=prompt("Time (HH:MM):","10:00");if(!time)return;
+ let stylist=prompt("Stylist name:",db.stylists[0]||"Staff");if(!stylist)return;
+ if(db.appointments.some(a=>a.date===date&&a.time===time&&a.stylist===stylist&&a.status!=="Cancelled")||db.blocked.some(b=>b.date===date&&b.time===time&&b.stylist===stylist)){notify("This slot is unavailable.");return}
+ db.appointments.push({id:"AP"+Date.now(),userId:u.id,serviceId:s.id,service:s.name,stylist,date,time,price:s.price,payment:"Pay at salon",paid:0,status:"Booked",created:new Date().toISOString()});
+ save();render("appointments");notify("Reservation added.");
+}
+function editAppointment(id){
+ let a=db.appointments.find(x=>x.id===id);if(!a)return;
+ let date=prompt("New date (YYYY-MM-DD):",a.date);if(!date)return;
+ let time=prompt("New time (HH:MM):",a.time);if(!time)return;
+ let stylist=prompt("Stylist:",a.stylist);if(!stylist)return;
+ if(db.appointments.some(x=>x.id!==id&&x.date===date&&x.time===time&&x.stylist===stylist&&x.status!=="Cancelled")||db.blocked.some(x=>x.date===date&&x.time===time&&x.stylist===stylist)){notify("That time slot is unavailable.");return}
+ a.date=date;a.time=time;a.stylist=stylist;save();render("appointments");notify("Appointment updated.");
+}
+function reschedule(id){editAppointment(id);render("myappointments")}
+function cancelAppointment(id){
+ let a=db.appointments.find(x=>x.id===id);if(!a||a.status==="Cancelled")return;
+ if(confirm("Cancel this appointment?")){a.status="Cancelled";save();render(page);notify("Appointment cancelled.")}
+}
+function contactCustomer(phone){
+ let choice=confirm("OK to open SMS. Cancel to open phone dialer.");
+ location.href=choice?"sms:"+phone:"tel:"+phone;
+}
+function manageServices(){
+ return heading("Manage Services","Add, update, and remove salon service offerings.")+
+ `<div class="panel"><h2>Add Service</h2><form onsubmit="addService(event)"><label>Name</label><input name="name" required><label>Category</label><input name="category" required><label>Price</label><input name="price" type="number" min="1" required><label>Duration in minutes</label><input name="duration" type="number" min="10" required><label>Image URL</label><input name="image" type="url"><label>Description</label><textarea name="description" required></textarea><button>Add Service</button></form></div>
+ <div class="panel"><h2>Current Services</h2><div class="table-wrap"><table><tr><th>Name</th><th>Category</th><th>Price</th><th>Duration</th><th>Actions</th></tr>${db.services.map(s=>`<tr><td>${safe(s.name)}</td><td>${safe(s.category)}</td><td>${money(s.price)}</td><td>${s.duration} min</td><td><button onclick="editService(${s.id})">Edit</button><button class="danger" onclick="deleteService(${s.id})">Delete</button></td></tr>`).join("")}</table></div></div>`;
+}
+function addService(e){e.preventDefault();let f=new FormData(e.target);db.services.push({id:Date.now(),name:f.get("name"),category:f.get("category"),price:Number(f.get("price")),duration:Number(f.get("duration")),image:f.get("image")||"https://placehold.co/600x400?text=Service",description:f.get("description")});save();render("services");notify("Service added.")}
+function editService(id){let s=db.services.find(x=>x.id===id);let name=prompt("Service name:",s.name);if(name===null)return;let price=Number(prompt("Price:",s.price));if(!price||price<1){notify("Invalid price.");return}s.name=name;s.price=price;save();render("services");notify("Service updated.")}
+function deleteService(id){if(db.appointments.some(a=>a.serviceId===id&&a.status!=="Cancelled")){notify("Cannot delete a service with active appointments.");return}if(confirm("Delete this service?")){db.services=db.services.filter(s=>s.id!==id);save();render("services")}}
+function stylists(){
+ return heading("Staff & Stylist Schedules","Manage the stylists available for bookings.")+
+ `<div class="panel"><h2>Current Stylists</h2>${db.stylists.map(s=>`<p>💇 ${safe(s)} <button class="danger" onclick="removeStylist('${safe(s)}')">Remove</button></p>`).join("")}<form onsubmit="addStylist(event)"><label>Add Stylist</label><input name="name" placeholder="Stylist name" required><button>Add Stylist</button></form></div>`;
+}
+function addStylist(e){e.preventDefault();let n=new FormData(e.target).get("name").trim();if(db.stylists.some(s=>s.toLowerCase()===n.toLowerCase())){notify("Stylist already exists.");return}db.stylists.push(n);save();render("stylists")}
+function removeStylist(n){if(db.appointments.some(a=>a.stylist===n&&a.status!=="Cancelled")){notify("This stylist has active appointments.");return}if(confirm("Remove stylist "+n+"?")){db.stylists=db.stylists.filter(s=>s!==n);save();render("stylists")}}
+function feedback(){
+ return heading("Customer Feedback","Share your experience or review feedback submitted by customers.")+
+ (current.role==="customer"?`<div class="panel"><h2>Leave Feedback</h2><form onsubmit="submitFeedback(event)"><label>Rating</label><select name="rating"><option value="5">★★★★★ - Excellent</option><option value="4">★★★★ - Very Good</option><option value="3">★★★ - Good</option><option value="2">★★ - Fair</option><option value="1">★ - Poor</option></select><label>Comments</label><textarea name="comment" required></textarea><button>Submit Feedback</button></form></div>`:"")+
+ `<div class="panel"><h2>Feedback Records</h2>${db.feedback.length?db.feedback.map(f=>`<div style="border-bottom:1px solid var(--line);padding:12px 0"><b>${safe(f.name)}</b> · ${"★".repeat(f.rating)}<p>${safe(f.comment)}</p><small class="muted">${safe(f.date)}</small></div>`).join(""):"<p>No feedback submitted yet.</p>"}</div>`;
+}
+function submitFeedback(e){e.preventDefault();let f=new FormData(e.target);db.feedback.push({id:Date.now(),userId:current.id,name:current.name,rating:Number(f.get("rating")),comment:f.get("comment"),date:new Date().toLocaleDateString()});save();notify("Thank you for your feedback!");render("feedback")}
+function profile(){
+ return heading("My Account","View and update your personal information.")+
+ `<div class="panel"><form onsubmit="saveProfile(event)"><label>Full name</label><input name="name" value="${safe(current.name)}" required><label>Email</label><input value="${safe(current.email)}" disabled><label>Phone</label><input name="phone" value="${safe(current.phone||"")}" required><button>Save Profile</button></form></div>`;
+}
+function saveProfile(e){e.preventDefault();let f=new FormData(e.target);current.name=f.get("name");current.phone=f.get("phone");let u=db.users.find(x=>x.id===current.id);u.name=current.name;u.phone=current.phone;save();document.getElementById("headerText").textContent="Welcome, "+current.name;notify("Profile updated.");render("profile")}
+save();
+</script>
+</body>
+</html>

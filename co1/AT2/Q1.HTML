@@ -1,0 +1,70 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>HTTP Response Analysis</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 30px;
+            background: #f2f5f9;
+        }
+        .container {
+            max-width: 650px;
+            margin: auto;
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+        }
+        pre {
+            background: #eeeeee;
+            padding: 15px;
+            white-space: pre-wrap;
+        }
+        button {
+            padding: 10px 15px;
+            cursor: pointer;
+        }
+        #output {
+            margin-top: 15px;
+            padding: 15px;
+            background: #e5f6e9;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2>HTTP Response Analysis</h2>
+
+    <h3>Given HTTP Response</h3>
+    <pre>HTTP/1.1 200 OK
+Content-Type: text/html
+Content-Length: -150
+Connection: keep-alive</pre>
+
+    <button onclick="analyze()">Analyze Response</button>
+
+    <div id="output">Click the button to analyze.</div>
+</div>
+
+<script>
+function analyze() {
+    const contentLength = -150;
+    const statusCode = 200;
+
+    let result = "";
+
+    if (contentLength < 0) {
+        result += "<p><b>Error:</b> Content-Length cannot be negative.</p>";
+        result += "<p><b>Correction:</b> Calculate the actual body length.</p>";
+    }
+
+    result += "<p>Status Code: " + statusCode + " OK</p>";
+    result += "<p>A 200 status indicates success, but the invalid header must be corrected.</p>";
+
+    document.getElementById("output").innerHTML = result;
+}
+</script>
+</body>
+</html>

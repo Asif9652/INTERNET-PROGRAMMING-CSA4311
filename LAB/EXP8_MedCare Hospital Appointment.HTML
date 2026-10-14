@@ -1,0 +1,373 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MedCare Hospital Appointment System</title>
+<style>
+:root{--blue:#1677c8;--navy:#12304a;--bg:#f2f7fb;--line:#dce7f0;--muted:#64788b;--green:#168568;--red:#cf4254}
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:var(--bg);color:#183047}
+header{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;background:white;padding:17px 5%;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:5}
+.logo{font-size:25px;font-weight:bold;color:var(--blue)}
+button{border:0;border-radius:8px;padding:10px 14px;background:var(--blue);color:white;cursor:pointer;font-weight:bold;margin:3px}
+button:hover{opacity:.85}
+.secondary{background:#e4f1fc;color:var(--navy)}
+.danger{background:var(--red)}
+input,select,textarea{width:100%;padding:11px;border:1px solid var(--line);border-radius:8px;margin:5px 0 12px;font:inherit;background:white}
+label{font-size:13px;font-weight:bold}
+.container{max-width:1200px;margin:auto;padding:24px}
+.hidden{display:none!important}
+.panel{background:white;border:1px solid var(--line);padding:20px;border-radius:13px;margin-bottom:20px}
+.hero{background:linear-gradient(120deg,#dceeff,#e2f8f0);padding:38px;border-radius:17px;display:flex;justify-content:space-between;align-items:center;gap:20px;margin-bottom:25px}
+.hero h1{font-size:clamp(30px,5vw,46px);margin:10px 0}
+.hero p{color:var(--muted);line-height:1.7}
+.hero-icon{font-size:90px}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:17px}
+.hospital,.doctor{background:white;border:1px solid var(--line);border-radius:12px;padding:18px}
+.hospital h3,.doctor h3{margin:8px 0}
+.muted{color:var(--muted);font-size:13px;line-height:1.6}
+.tag{display:inline-block;background:#e5f3ff;color:#165b94;padding:5px 9px;border-radius:20px;font-size:11px}
+.price{color:var(--green);font-weight:bold}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-bottom:20px}
+.stat{background:white;border:1px solid var(--line);padding:18px;border-radius:11px}
+.stat strong{display:block;font-size:27px;margin-top:9px}
+nav{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:20px}
+nav button{background:var(--navy)}
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:650px}
+th,td{text-align:left;padding:12px;border-bottom:1px solid var(--line);font-size:13px}
+th{background:#eaf4fc}
+.login{max-width:460px;margin:30px auto}
+.modal-bg{position:fixed;inset:0;background:#10283b99;z-index:10;display:grid;place-items:center;padding:15px}
+.modal{background:white;border-radius:14px;padding:23px;width:min(600px,100%);max-height:90vh;overflow:auto}
+.modal-head{display:flex;justify-content:space-between;align-items:center}
+footer{text-align:center;padding:25px;color:var(--muted)}
+@media(max-width:850px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:550px){.container{padding:13px}.grid{grid-template-columns:1fr}.hero{padding:22px}.hero-icon{font-size:55px}header{padding:14px}}
+</style>
+</head>
+<body>
+<header>
+ <div class="logo">✚ MedCare</div>
+ <div id="headerText">Your health, our priority</div>
+ <div><button id="loginBtn" onclick="showLogin()">Login</button><button id="logoutBtn" class="hidden" onclick="logout()">Logout</button></div>
+</header>
+
+<div id="loginPage" class="container">
+ <div class="panel login">
+  <h1>Welcome to MedCare</h1>
+  <p class="muted">Find hospitals and doctors and book appointments online.</p>
+  <label>Email</label><input id="loginEmail" type="email" placeholder="Enter email">
+  <label>Password</label><input id="loginPassword" type="password" placeholder="Enter password">
+  <label>Login as</label>
+  <select id="loginRole"><option value="patient">Patient</option><option value="admin">Administrator</option><option value="hospital">Hospital</option></select>
+  <button style="width:100%" onclick="login()">Login</button>
+  <hr>
+  <h3>Patient Registration</h3>
+  <input id="regName" placeholder="Full name">
+  <input id="regEmail" type="email" placeholder="Email">
+  <input id="regPass" type="password" placeholder="Password (minimum 6 characters)">
+  <input id="regPhone" placeholder="Phone number">
+  <button style="width:100%" onclick="register('patient')">Register as Patient</button>
+  <p class="muted">Admin: admin@medcare.com / admin123</p>
+  <p class="muted">Hospital: hospital@medcare.com / hosp123</p>
+  <p class="muted">Patient: patient@medcare.com / patient123</p>
+  <hr>
+  <h3>Register a Hospital</h3>
+  <input id="hospitalName" placeholder="Hospital name">
+  <input id="hospitalCity" placeholder="City / location">
+  <input id="hospitalEmail" type="email" placeholder="Hospital email">
+  <input id="hospitalPass" type="password" placeholder="Password (minimum 6 characters)">
+  <button style="width:100%" onclick="registerHospital()">Register Hospital</button>
+ </div>
+</div>
+
+<div id="app" class="container hidden">
+ <nav id="navigation"></nav>
+ <div id="content"></div>
+</div>
+
+<div id="modalRoot"></div>
+<footer>© 2026 MedCare · Hospital Appointment Booking System · Internet Programming Lab</footer>
+
+<script>
+const KEY="medcareHospitalData";
+const initial={
+ users:[
+  {id:"a1",name:"MedCare Admin",email:"admin@medcare.com",password:"admin123",phone:"",role:"admin"},
+  {id:"h1",name:"City Care Hospital",email:"hospital@medcare.com",password:"hosp123",phone:"9876543210",role:"hospital",hospitalId:1},
+  {id:"p1",name:"Demo Patient",email:"patient@medcare.com",password:"patient123",phone:"9876543211",role:"patient"}
+ ],
+ hospitals:[
+  {id:1,name:"City Care Hospital",city:"Chennai",address:"Anna Nagar, Chennai",phone:"9876543210",description:"Multi-specialty hospital with experienced doctors."},
+  {id:2,name:"Sunrise Medical Centre",city:"Bengaluru",address:"Indiranagar, Bengaluru",phone:"9876543212",description:"Family medicine and specialist consultations."},
+  {id:3,name:"Green Valley Hospital",city:"Hyderabad",address:"Madhapur, Hyderabad",phone:"9876543213",description:"Modern facilities and outpatient services."}
+ ],
+ doctors:[
+  {id:1,name:"Dr. Ananya Sharma",specialty:"Cardiology",hospitalId:1,fee:700,days:"Monday, Wednesday, Friday"},
+  {id:2,name:"Dr. Rahul Kumar",specialty:"Dermatology",hospitalId:1,fee:500,days:"Tuesday, Thursday, Saturday"},
+  {id:3,name:"Dr. Priya Reddy",specialty:"Pediatrics",hospitalId:2,fee:600,days:"Monday, Tuesday, Friday"},
+  {id:4,name:"Dr. Arjun Rao",specialty:"General Medicine",hospitalId:3,fee:400,days:"Monday to Saturday"},
+  {id:5,name:"Dr. Meera Iyer",specialty:"Orthopedics",hospitalId:2,fee:800,days:"Wednesday, Thursday, Saturday"}
+ ],
+ appointments:[],reviews:[],checkins:[]
+};
+let db;
+try{db=JSON.parse(localStorage.getItem(KEY))||JSON.parse(JSON.stringify(initial))}
+catch(e){db=JSON.parse(JSON.stringify(initial))}
+let current=null,page="home",searchLocation="",searchSpecialty="All",selectedHospital=1;
+function save(){localStorage.setItem(KEY,JSON.stringify(db))}
+function safe(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+function money(n){return "₹"+Number(n).toLocaleString("en-IN")}
+function notify(s){alert(s)}
+function showLogin(){document.getElementById("loginPage").classList.remove("hidden");document.getElementById("app").classList.add("hidden");document.getElementById("loginBtn").classList.remove("hidden");document.getElementById("logoutBtn").classList.add("hidden")}
+function login(){
+ let email=document.getElementById("loginEmail").value.trim().toLowerCase(),pass=document.getElementById("loginPassword").value,role=document.getElementById("loginRole").value;
+ let found=db.users.find(u=>u.email.toLowerCase()===email&&u.password===pass&&u.role===role);
+ if(!found){notify("Invalid email, password, or account type.");return}
+ current=found;enter();
+}
+function register(role){
+ let name=document.getElementById("regName").value.trim(),email=document.getElementById("regEmail").value.trim().toLowerCase(),password=document.getElementById("regPass").value,phone=document.getElementById("regPhone").value.trim();
+ if(!name||!email||password.length<6||!phone){notify("Complete all registration fields. Password must be at least 6 characters.");return}
+ if(db.users.some(u=>u.email.toLowerCase()===email)){notify("Email already registered.");return}
+ current={id:"u"+Date.now(),name,email,password,phone,role};
+ db.users.push(current);save();enter();notify("Registration successful.");
+}
+function registerHospital(){
+ let name=document.getElementById("hospitalName").value.trim(),city=document.getElementById("hospitalCity").value.trim(),email=document.getElementById("hospitalEmail").value.trim().toLowerCase(),password=document.getElementById("hospitalPass").value;
+ if(!name||!city||!email||password.length<6){notify("Complete all hospital fields. Password must be at least 6 characters.");return}
+ if(db.users.some(u=>u.email.toLowerCase()===email)){notify("Email already registered.");return}
+ let h={id:Date.now(),name,city,address:city,phone:"",description:"Newly registered hospital."};
+ db.hospitals.push(h);
+ db.users.push({id:"h"+Date.now(),name,email,password,phone:"",role:"hospital",hospitalId:h.id});
+ save();notify("Hospital registered. You can now log in as Hospital.");
+}
+function enter(){
+ document.getElementById("loginPage").classList.add("hidden");document.getElementById("app").classList.remove("hidden");
+ document.getElementById("loginBtn").classList.add("hidden");document.getElementById("logoutBtn").classList.remove("hidden");
+ document.getElementById("headerText").textContent="Welcome, "+current.name;
+ buildNav();render("home");
+}
+function logout(){current=null;showLogin();document.getElementById("headerText").textContent="Your health, our priority"}
+function buildNav(){
+ let links=current.role==="patient"
+ ?[["home","Dashboard"],["hospitals","Search Hospitals"],["doctors","Find Doctors"],["book","Book Appointment"],["appointments","My Appointments"],["checkin","Check-in Form"],["reviews","Doctor Reviews"],["profile","My Profile"]]
+ :current.role==="admin"
+ ?[["home","Dashboard"],["hospitalsAdmin","Manage Hospitals"],["doctorsAdmin","Manage Doctors"],["appointments","Manage Appointments"],["statistics","Statistics"],["reviews","Rating Details"]]
+ :[["home","Hospital Dashboard"],["hospitalProfile","Hospital Details"],["doctorsAdmin","Manage Doctors"],["appointments","Appointments"]];
+ document.getElementById("navigation").innerHTML=links.map(x=>`<button onclick="render('${x[0]}')">${x[1]}</button>`).join("");
+}
+function render(p){
+ page=p;
+ let pages={home,hospitals,doctors,book,appointments,checkin,reviews,profile,hospitalsAdmin,doctorsAdmin,statistics,hospitalProfile};
+ document.getElementById("content").innerHTML=(pages[p]||home)();
+}
+function heading(t,d){return `<div class="panel"><h1>${t}</h1><p class="muted">${d}</p></div>`}
+function home(){
+ let patient=current.role==="patient";
+ let active=db.appointments.filter(a=>a.status!=="Cancelled");
+ let mine=db.appointments.filter(a=>a.patientId===current.id&&a.status!=="Cancelled");
+ return `<div class="hero"><div><span class="tag">HEALTHCARE MADE SIMPLE</span><h1>Better care,<br>less waiting.</h1><p>Search hospitals, discover doctors, and schedule appointments conveniently.</p><button onclick="render('${patient?"hospitals":"appointments"}')">${patient?"Find a Hospital":"View Appointments"} →</button></div><div class="hero-icon">🏥</div></div>
+ <div class="stats"><div class="stat">Hospitals<strong>${db.hospitals.length}</strong></div><div class="stat">Doctors<strong>${db.doctors.length}</strong></div><div class="stat">${patient?"My Appointments":"All Appointments"}<strong>${patient?mine.length:active.length}</strong></div><div class="stat">Reviews<strong>${db.reviews.length}</strong></div></div>
+ <h2>Available Hospitals</h2>${hospitalCards(db.hospitals.slice(0,3))}`;
+}
+function hospitalCards(list){
+ if(!list.length)return '<div class="panel">No hospitals found.</div>';
+ return `<div class="grid">${list.map(h=>`<div class="hospital"><span class="tag">🏥 Hospital</span><h3>${safe(h.name)}</h3><p class="muted">📍 ${safe(h.address||h.city)}<br>${safe(h.description||"")}</p><p>Doctors: ${db.doctors.filter(d=>d.hospitalId===h.id).length}</p><button onclick="viewHospital(${h.id})">View Hospital</button>${current.role==="patient"?`<button class="secondary" onclick="render('doctors')">Find Doctor</button>`:""}<button class="secondary" onclick="mapHospital(${h.id})">View Map</button></div>`).join("")}</div>`;
+}
+function hospitals(){
+ return heading("Search Hospitals","Find a hospital by city or location.")+
+ `<div class="panel"><label>City or location</label><input id="locationSearch" value="${safe(searchLocation)}" placeholder="e.g. Chennai" oninput="searchLocation=this.value;refreshHospitals()"><div id="hospitalResults">${hospitalCards(db.hospitals.filter(h=>(h.name+" "+h.city+" "+h.address).toLowerCase().includes(searchLocation.toLowerCase())))}</div></div>`;
+}
+function refreshHospitals(){let el=document.getElementById("hospitalResults");if(el)el.innerHTML=hospitalCards(db.hospitals.filter(h=>(h.name+" "+h.city+" "+h.address).toLowerCase().includes(searchLocation.toLowerCase())))}
+function viewHospital(id){
+ let h=db.hospitals.find(x=>x.id===id);if(!h)return;
+ modal("Hospital Details",`<h2>${safe(h.name)}</h2><p>${safe(h.description||"")}</p><p>Location: ${safe(h.address||h.city)}<br>Phone: ${safe(h.phone||"Not provided")}</p><h3>Doctors</h3>${db.doctors.filter(d=>d.hospitalId===id).map(d=>`<p>${safe(d.name)} — ${safe(d.specialty)} (${money(d.fee)}) <button onclick="closeModal();startBooking(${d.id})">Book</button></p>`).join("")}<button onclick="mapHospital(${id})">Open Map</button>`);
+}
+function mapHospital(id){
+ let h=db.hospitals.find(x=>x.id===id);if(!h)return;
+ let q=encodeURIComponent((h.address||h.city)+", "+h.name);
+ window.open("https://www.google.com/maps/search/?api=1&query="+q,"_blank","noopener");
+}
+function doctors(){
+ let specialties=[...new Set(db.doctors.map(d=>d.specialty))];
+ let list=db.doctors.filter(d=>(d.name+" "+d.specialty).toLowerCase().includes(searchSpecialty==="All"?"":searchSpecialty.toLowerCase()));
+ return heading("Find a Doctor","Search by name or specialty, compare ratings, and book an appointment.")+
+ `<div class="panel"><input placeholder="Search doctor or specialty..." oninput="searchSpecialty=this.value;refreshDoctors()"><select onchange="searchSpecialty=this.value;refreshDoctors()"><option value="All">All Specialties</option>${specialties.map(s=>`<option>${safe(s)}</option>`).join("")}</select><div id="doctorResults">${doctorCards(list)}</div></div>`;
+}
+function refreshDoctors(){let el=document.getElementById("doctorResults");if(!el)return;el.innerHTML=doctorCards(db.doctors.filter(d=>(d.name+" "+d.specialty).toLowerCase().includes(searchSpecialty==="All"?"":searchSpecialty.toLowerCase())))}
+function doctorCards(list){
+ if(!list.length)return "<p>No doctors found.</p>";
+ return `<div class="grid">${list.map(d=>{let h=db.hospitals.find(x=>x.id===d.hospitalId)||{name:"Hospital"};let reviews=db.reviews.filter(r=>r.doctorId===d.id),avg=reviews.length?reviews.reduce((s,r)=>s+r.rating,0)/reviews.length:0;return `<div class="doctor"><span class="tag">${safe(d.specialty)}</span><h3>👨‍⚕️ ${safe(d.name)}</h3><p class="muted">${safe(h.name)}<br>📍 ${safe(h.city)}<br>Schedule: ${safe(d.days||"Contact hospital")}</p><p class="price">${money(d.fee)} consultation</p><p>⭐ ${avg?avg.toFixed(1):"No ratings"} (${reviews.length} reviews)</p><button onclick="doctorDetails(${d.id})">Details</button>${current.role==="patient"?`<button onclick="startBooking(${d.id})">Book Appointment</button>`:""}</div>`}).join("")}</div>`;
+}
+function doctorDetails(id){
+ let d=db.doctors.find(x=>x.id===id),h=db.hospitals.find(x=>x.id===d.hospitalId);
+ let reviews=db.reviews.filter(r=>r.doctorId===id);
+ modal("Doctor Profile",`<h2>${safe(d.name)}</h2><p>Specialty: ${safe(d.specialty)}<br>Hospital: ${safe(h?.name||"") }<br>Location: ${safe(h?.city||"")}<br>Consultation fee: ${money(d.fee)}<br>Schedule: ${safe(d.days||"Contact hospital")}</p><h3>Patient Reviews</h3>${reviews.length?reviews.map(r=>`<p>${"★".repeat(r.rating)} — ${safe(r.comment)}</p>`).join(""):"<p>No reviews yet.</p>"}${current.role==="patient"?`<button onclick="closeModal();startBooking(${d.id})">Book Appointment</button>`:""}`);
+}
+function startBooking(id){selectedHospital=db.doctors.find(d=>d.id===id)?.hospitalId||db.hospitals[0]?.id;window.bookingDoctor=id;render("book")}
+function book(){
+ if(current.role!=="patient")return heading("Appointment Booking","Patient accounts can book appointments.");
+ let doc=db.doctors.find(d=>d.id===window.bookingDoctor)||db.doctors[0];
+ if(!doc)return heading("No doctors available","Please check back later.");
+ let h=db.hospitals.find(x=>x.id===doc.hospitalId);
+ let today=new Date().toISOString().slice(0,10);
+ return heading("Book an Appointment","Choose a hospital, doctor, date, and available time.")+
+ `<div class="panel"><form onsubmit="bookAppointment(event)">
+ <label>Hospital</label><select id="hospitalChoice" onchange="hospitalChanged()">${db.hospitals.map(x=>`<option value="${x.id}" ${x.id===doc.hospitalId?"selected":""}>${safe(x.name)} — ${safe(x.city)}</option>`).join("")}</select>
+ <label>Doctor</label><select name="doctorId" id="doctorChoice" onchange="window.bookingDoctor=Number(this.value);render('book')">${db.doctors.filter(d=>d.hospitalId===doc.hospitalId).map(d=>`<option value="${d.id}" ${d.id===doc.id?"selected":""}>${safe(d.name)} — ${safe(d.specialty)} (${money(d.fee)})</option>`).join("")}</select>
+ <p class="muted">Consultation fee: ${money(doc.fee)} · ${safe(h?.address||"")}</p>
+ <label>Appointment Date</label><input type="date" name="date" min="${today}" required>
+ <label>Available Time</label><select name="time">${["09:00","09:30","10:00","10:30","11:00","11:30","12:00","14:00","14:30","15:00","15:30","16:00","16:30"].map(t=>`<option>${t}</option>`).join("")}</select>
+ <label>Reason for visit</label><textarea name="reason" placeholder="Briefly describe the reason for your visit"></textarea>
+ <button>Confirm Appointment</button></form><p class="muted">Demo scheduling only. Please verify actual availability with the hospital.</p></div>`;
+}
+function hospitalChanged(){
+ let id=Number(document.getElementById("hospitalChoice").value);
+ let docs=db.doctors.filter(d=>d.hospitalId===id);
+ let el=document.getElementById("doctorChoice");
+ el.innerHTML=docs.map(d=>`<option value="${d.id}">${safe(d.name)} — ${safe(d.specialty)}</option>`).join("");
+ if(docs.length){window.bookingDoctor=docs[0].id;render("book")}
+}
+function bookAppointment(e){
+ e.preventDefault();let f=new FormData(e.target),doc=db.doctors.find(d=>d.id===Number(f.get("doctorId"))),date=f.get("date"),time=f.get("time");
+ if(!doc){notify("Choose a doctor.");return}
+ if(date<new Date().toISOString().slice(0,10)){notify("Choose a valid date.");return}
+ let busy=db.appointments.some(a=>a.doctorId===doc.id&&a.date===date&&a.time===time&&a.status!=="Cancelled");
+ if(busy){notify("This slot is already booked. Choose another time.");return}
+ db.appointments.push({id:"MC"+Date.now(),patientId:current.id,doctorId:doc.id,hospitalId:doc.hospitalId,doctor:doc.name,date,time,reason:f.get("reason"),status:"Booked",checkin:null,created:new Date().toISOString()});
+ save();notify("Appointment booked successfully.");render("appointments");
+}
+function appointments(){
+ let admin=current.role==="admin",hospitalUser=current.role==="hospital";
+ let list=db.appointments.filter(a=>{
+  if(admin)return true;
+  if(hospitalUser)return a.hospitalId===current.hospitalId;
+  return a.patientId===current.id;
+ }).slice().reverse();
+ return heading(admin?"Manage All Appointments":hospitalUser?"Hospital Appointments":"My Appointments","View appointment status, dates, and patient details.")+
+ `<div class="panel">${admin||hospitalUser?`<button onclick="manualAppointment()">＋ Add Appointment</button>`:""}${appointmentTable(list,admin||hospitalUser)}</div>`;
+}
+function appointmentTable(list,manager=false){
+ if(!list.length)return "<p>No appointments found.</p>";
+ return `<div class="table-wrap"><table><tr><th>Patient</th><th>Doctor</th><th>Hospital</th><th>Date / Time</th><th>Status</th>${manager?"<th>Actions</th>":""}</tr>${list.map(a=>{let p=db.users.find(u=>u.id===a.patientId)||{name:"Patient",phone:""},d=db.doctors.find(x=>x.id===a.doctorId)||{name:a.doctor||"Doctor"},h=db.hospitals.find(x=>x.id===a.hospitalId)||{name:"Hospital"};return `<tr><td>${safe(p.name)}<br><small>${safe(p.phone||"")}</small></td><td>${safe(d.name)}</td><td>${safe(h.name)}</td><td>${safe(a.date)}<br>${safe(a.time)}</td><td>${safe(a.status)}</td>${manager?`<td><button onclick="updateAppointment('${a.id}')">Update</button><button class="danger" onclick="cancelAppointment('${a.id}')">Cancel</button>${p.phone?`<button class="secondary" onclick="contactPatient('${p.phone}')">Call/SMS</button>`:""}</td>`:""}</tr>`}).join("")}</table></div>`;
+}
+function updateAppointment(id){
+ let a=db.appointments.find(x=>x.id===id);if(!a)return;
+ let status=prompt("Enter status: Booked, Confirmed, Checked In, Completed, Cancelled",a.status);if(!status)return;
+ if(!["Booked","Confirmed","Checked In","Completed","Cancelled"].includes(status)){notify("Invalid status.");return}
+ a.status=status;save();render("appointments");notify("Appointment status updated.");
+}
+function cancelAppointment(id){
+ let a=db.appointments.find(x=>x.id===id);if(!a)return;
+ if(confirm("Cancel this appointment?")){a.status="Cancelled";save();render(page);notify("Appointment cancelled.");}
+}
+function manualAppointment(){
+ let email=prompt("Enter patient email:");if(!email)return;
+ let p=db.users.find(u=>u.email.toLowerCase()===email.toLowerCase()&&u.role==="patient");
+ if(!p){notify("Patient not found.");return}
+ let d=db.doctors.find(x=>current.role!=="hospital"||x.hospitalId===current.hospitalId);
+ if(!d){notify("No doctors found for this hospital.");return}
+ let date=prompt("Date (YYYY-MM-DD):");if(!date)return;
+ let time=prompt("Time (HH:MM):","10:00");if(!time)return;
+ if(db.appointments.some(a=>a.doctorId===d.id&&a.date===date&&a.time===time&&a.status!=="Cancelled")){notify("That doctor already has an appointment at this time.");return}
+ db.appointments.push({id:"MC"+Date.now(),patientId:p.id,doctorId:d.id,hospitalId:d.hospitalId,doctor:d.name,date,time,status:"Booked",reason:"Added by hospital"});
+ save();render("appointments");notify("Appointment created.");
+}
+function checkin(){
+ let list=db.appointments.filter(a=>a.patientId===current.id&&a.status!=="Cancelled");
+ return heading("Patient Check-in","Submit visit information for one of your appointments.")+
+ `<div class="panel"><form onsubmit="submitCheckin(event)"><label>Select Appointment</label><select name="appointmentId" required>${list.map(a=>`<option value="${a.id}">${safe(a.date)} ${safe(a.time)} — ${safe(a.doctor)}</option>`).join("")}</select><label>Reason for visit</label><textarea name="reason" required></textarea><label>Allergies or important notes (optional)</label><textarea name="notes"></textarea><button ${!list.length?"disabled":""}>Submit Check-in</button></form></div>
+ <div class="panel"><h2>Past Check-in Details</h2>${db.checkins.filter(c=>c.patientId===current.id).map(c=>`<p><b>${safe(c.date)}</b><br>Reason: ${safe(c.reason)}<br>Notes: ${safe(c.notes||"None")}</p>`).join("")||"<p>No check-ins submitted.</p>"}</div>`;
+}
+function submitCheckin(e){
+ e.preventDefault();let f=new FormData(e.target),a=db.appointments.find(x=>x.id===f.get("appointmentId")&&x.patientId===current.id);
+ if(!a){notify("Appointment not found.");return}
+ db.checkins.push({id:Date.now(),patientId:current.id,appointmentId:a.id,date:new Date().toLocaleDateString(),reason:f.get("reason"),notes:f.get("notes")});
+ a.checkin=true;if(a.status==="Booked"||a.status==="Confirmed")a.status="Checked In";
+ save();notify("Check-in submitted.");render("checkin");
+}
+function reviews(){
+ if(current.role==="patient"){
+  return heading("Doctor Reviews","Rate your experience and help other patients choose a doctor.")+
+  `<div class="panel"><form onsubmit="submitReview(event)"><label>Doctor</label><select name="doctorId">${db.doctors.map(d=>`<option value="${d.id}">${safe(d.name)} — ${safe(d.specialty)}</option>`).join("")}</select><label>Rating</label><select name="rating"><option value="5">★★★★★ Excellent</option><option value="4">★★★★ Very Good</option><option value="3">★★★ Good</option><option value="2">★★ Fair</option><option value="1">★ Poor</option></select><label>Review</label><textarea name="comment" required></textarea><button>Submit Review</button></form></div>`;
+ }
+ return heading("Rating Details","Review ratings and patient feedback.")+
+ `<div class="panel">${db.reviews.length?db.reviews.map(r=>`<p><b>${safe(r.patientName)}</b> · ${"★".repeat(r.rating)}<br>Doctor: ${safe(db.doctors.find(d=>d.id===r.doctorId)?.name||"Doctor")}<br>${safe(r.comment)}</p><hr>`).join(""):"No reviews submitted yet."}</div>`;
+}
+function submitReview(e){
+ e.preventDefault();let f=new FormData(e.target);
+ db.reviews.push({id:Date.now(),patientId:current.id,patientName:current.name,doctorId:Number(f.get("doctorId")),rating:Number(f.get("rating")),comment:f.get("comment")});
+ save();notify("Thank you for your feedback.");render("reviews");
+}
+function profile(){
+ return heading("My Profile","Update your personal details.")+
+ `<div class="panel"><form onsubmit="saveProfile(event)"><label>Full Name</label><input name="name" value="${safe(current.name)}" required><label>Email</label><input value="${safe(current.email)}" disabled><label>Phone</label><input name="phone" value="${safe(current.phone||"")}" required><button>Save Profile</button></form></div>`;
+}
+function saveProfile(e){e.preventDefault();let f=new FormData(e.target);current.name=f.get("name");current.phone=f.get("phone");let u=db.users.find(x=>x.id===current.id);u.name=current.name;u.phone=current.phone;save();document.getElementById("headerText").textContent="Welcome, "+current.name;notify("Profile updated.");render("profile")}
+function hospitalsAdmin(){
+ if(current.role!=="admin")return heading("Access Restricted","Administrator access required.");
+ return heading("Manage Hospitals","Review registered hospitals and update their details.")+
+ `<div class="panel"><h2>Register a Hospital</h2><form onsubmit="addHospital(event)"><label>Name</label><input name="name" required><label>City</label><input name="city" required><label>Address</label><input name="address" required><label>Phone</label><input name="phone"><label>Description</label><textarea name="description"></textarea><button>Add Hospital</button></form></div>
+ <div class="panel">${hospitalCards(db.hospitals)}<h3>Hospital Records</h3><div class="table-wrap"><table><tr><th>Name</th><th>City</th><th>Address</th><th>Actions</th></tr>${db.hospitals.map(h=>`<tr><td>${safe(h.name)}</td><td>${safe(h.city)}</td><td>${safe(h.address)}</td><td><button onclick="editHospital(${h.id})">Edit</button></td></tr>`).join("")}</table></div></div>`;
+}
+function addHospital(e){
+ e.preventDefault();let f=new FormData(e.target);
+ db.hospitals.push({id:Date.now(),name:f.get("name"),city:f.get("city"),address:f.get("address"),phone:f.get("phone"),description:f.get("description")});
+ save();render("hospitalsAdmin");notify("Hospital added.");
+}
+function editHospital(id){
+ let h=db.hospitals.find(x=>x.id===id),name=prompt("Hospital name:",h.name);if(name===null)return;
+ let city=prompt("City:",h.city);if(city===null)return;
+ let address=prompt("Address:",h.address);if(address===null)return;
+ h.name=name;h.city=city;h.address=address;save();render("hospitalsAdmin");notify("Hospital details updated.");
+}
+function doctorsAdmin(){
+ if(current.role==="hospital")return hospitalDoctors();
+ if(current.role!=="admin")return heading("Access Restricted","Administrator access required.");
+ return heading("Manage Doctors","Add doctors and update their specialties, hospital and fees.")+
+ `<div class="panel"><form onsubmit="addDoctor(event)"><label>Doctor name</label><input name="name" required><label>Specialty</label><input name="specialty" required><label>Hospital</label><select name="hospitalId">${db.hospitals.map(h=>`<option value="${h.id}">${safe(h.name)}</option>`).join("")}</select><label>Consultation fee</label><input name="fee" type="number" min="0" required><label>Schedule</label><input name="days" placeholder="Monday to Friday"><button>Add Doctor</button></form></div>
+ <div class="panel"><div class="table-wrap"><table><tr><th>Name</th><th>Specialty</th><th>Hospital</th><th>Fee</th><th>Actions</th></tr>${db.doctors.map(d=>`<tr><td>${safe(d.name)}</td><td>${safe(d.specialty)}</td><td>${safe(db.hospitals.find(h=>h.id===d.hospitalId)?.name||"")}</td><td>${money(d.fee)}</td><td><button onclick="editDoctor(${d.id})">Edit</button><button class="danger" onclick="deleteDoctor(${d.id})">Delete</button></td></tr>`).join("")}</table></div></div>`;
+}
+function hospitalDoctors(){
+ let hId=current.hospitalId;
+ return heading("Manage Hospital Doctors","Add doctors associated with your hospital.")+
+ `<div class="panel"><form onsubmit="addDoctor(event)"><label>Doctor name</label><input name="name" required><label>Specialty</label><input name="specialty" required><input type="hidden" name="hospitalId" value="${hId}"><label>Consultation fee</label><input name="fee" type="number" min="0" required><label>Schedule</label><input name="days" placeholder="Monday to Friday"><button>Add Doctor</button></form><h3>Your Doctors</h3>${doctorCards(db.doctors.filter(d=>d.hospitalId===hId))}</div>`;
+}
+function addDoctor(e){
+ e.preventDefault();let f=new FormData(e.target),hospitalId=current.role==="hospital"?current.hospitalId:Number(f.get("hospitalId"));
+ db.doctors.push({id:Date.now(),name:f.get("name"),specialty:f.get("specialty"),hospitalId,fee:Number(f.get("fee")),days:f.get("days")});
+ save();render("doctorsAdmin");notify("Doctor added.");
+}
+function editDoctor(id){
+ let d=db.doctors.find(x=>x.id===id),name=prompt("Doctor name:",d.name);if(name===null)return;
+ let specialty=prompt("Specialty:",d.specialty);if(specialty===null)return;
+ let fee=Number(prompt("Consultation fee:",d.fee));if(!Number.isFinite(fee)||fee<0){notify("Invalid fee.");return}
+ d.name=name;d.specialty=specialty;d.fee=fee;save();render("doctorsAdmin");notify("Doctor updated.");
+}
+function deleteDoctor(id){if(db.appointments.some(a=>a.doctorId===id&&a.status!=="Cancelled")){notify("Doctor has active appointments.");return}if(confirm("Delete doctor?")){db.doctors=db.doctors.filter(d=>d.id!==id);save();render("doctorsAdmin")}}
+function hospitalProfile(){
+ let h=db.hospitals.find(x=>x.id===current.hospitalId);
+ if(!h)return heading("Hospital Details","No hospital profile is linked to this account.");
+ return heading("Hospital Details","Update your hospital information and location.")+
+ `<div class="panel"><form onsubmit="saveHospitalProfile(event)"><label>Hospital Name</label><input name="name" value="${safe(h.name)}" required><label>City</label><input name="city" value="${safe(h.city)}" required><label>Address</label><input name="address" value="${safe(h.address)}" required><label>Phone</label><input name="phone" value="${safe(h.phone||"")}"><label>Description</label><textarea name="description">${safe(h.description||"")}</textarea><button>Save Hospital Details</button></form><button class="secondary" onclick="mapHospital(${h.id})">View Location on Google Maps</button></div>`;
+}
+function saveHospitalProfile(e){e.preventDefault();let h=db.hospitals.find(x=>x.id===current.hospitalId),f=new FormData(e.target);Object.assign(h,{name:f.get("name"),city:f.get("city"),address:f.get("address"),phone:f.get("phone"),description:f.get("description")});current.name=h.name;save();document.getElementById("headerText").textContent="Welcome, "+current.name;notify("Hospital details updated.");render("hospitalProfile")}
+function statistics(){
+ if(current.role!=="admin")return heading("Access Restricted","Administrator access required.");
+ let active=db.appointments.filter(a=>!["Cancelled","Completed"].includes(a.status)).length,completed=db.appointments.filter(a=>a.status==="Completed").length,cancelled=db.appointments.filter(a=>a.status==="Cancelled").length;
+ return heading("Appointment Statistics","Overview of hospital bookings and patient feedback.")+
+ `<div class="stats"><div class="stat">Total Appointments<strong>${db.appointments.length}</strong></div><div class="stat">Active<strong>${active}</strong></div><div class="stat">Completed<strong>${completed}</strong></div><div class="stat">Cancelled<strong>${cancelled}</strong></div></div>
+ <div class="panel"><h2>Appointments by Hospital</h2>${db.hospitals.map(h=>`<p>${safe(h.name)} — ${db.appointments.filter(a=>a.hospitalId===h.id).length} appointments</p>`).join("")}</div>
+ <div class="panel"><h2>Doctor Ratings</h2>${db.doctors.map(d=>{let rs=db.reviews.filter(r=>r.doctorId===d.id),avg=rs.length?rs.reduce((s,r)=>s+r.rating,0)/rs.length:0;return `<p>${safe(d.name)} — ${avg?avg.toFixed(1)+" / 5":"No ratings"} (${rs.length} reviews)</p>`}).join("")}</div>`;
+}
+function modal(title,body){document.getElementById("modalRoot").innerHTML=`<div class="modal-bg" onclick="if(event.target===this)closeModal()"><div class="modal"><div class="modal-head"><h2>${title}</h2><button class="secondary" onclick="closeModal()">✕</button></div>${body}</div></div>`}
+function closeModal(){document.getElementById("modalRoot").innerHTML=""}
+function contactPatient(phone){let sms=confirm("OK to open SMS. Cancel to open phone dialer.");location.href=sms?"sms:"+phone:"tel:"+phone}
+save();
+</script>
+</body>
+</html>

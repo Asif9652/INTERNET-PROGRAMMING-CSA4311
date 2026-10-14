@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Bus Ticket Booking</title>
+<style>
+body{font-family:Arial;background:#eee;text-align:center}
+header{background:#234;color:white;padding:20px}
+button,input,select{padding:10px;margin:5px}
+.bus{background:white;margin:15px;padding:15px}
+</style>
+</head>
+<body>
+
+<header>
+<h1>🚌 Bus Ticket Booking System</h1>
+<button onclick="home()">Home</button>
+<button onclick="search()">Search Bus</button>
+<button onclick="login()">Login</button>
+<button onclick="register()">Register</button>
+<button onclick="booking()">My Booking</button>
+<button onclick="admin()">Admin</button>
+</header>
+
+<div id="app">
+<h2>Welcome to Bus Booking</h2>
+<p>Search and book your bus ticket easily.</p>
+</div>
+
+<script>
+function home(){
+app.innerHTML="<h2>Welcome</h2><p>Book your bus tickets online.</p>";
+}
+
+function search(){
+app.innerHTML=`
+<h2>Search Bus</h2>
+<input placeholder="From">
+<input placeholder="To">
+<input type="date">
+<input type="time">
+<button onclick="alert('Bus Found')">Search</button>
+<div class="bus"><h3>Volvo Bus</h3>
+<p>Chennai to Bangalore</p><p>Seats Available: 20</p>
+<button onclick="book()">Book Ticket</button></div>`;
+}
+
+function book(){
+alert("Ticket booked successfully!");
+}
+
+function login(){
+app.innerHTML=`
+<h2>Login</h2>
+<input placeholder="Username">
+<input type="password" placeholder="Password">
+<button onclick="alert('Login Successful')">Login</button>
+<p>Forgot Password? | Change Password</p>`;
+}
+
+function register(){
+app.innerHTML=`
+<h2>Registration</h2>
+<input placeholder="Name"><input placeholder="Email">
+<input placeholder="Password">
+<button onclick="alert('Registered Successfully')">Register</button>`;
+}
+
+function booking(){
+app.innerHTML=`
+<h2>My Booking</h2><p>Bus: Volvo</p>
+<p>Route: Chennai to Bangalore</p>
+<button onclick="alert('Booking Cancelled')">Cancel Ticket</button>`;
+}
+
+function admin(){
+app.innerHTML=`
+<h2>Admin Panel</h2>
+<input placeholder="Bus Type">
+<input placeholder="Route">
+<input placeholder="Available Seats">
+<button onclick="alert('Bus Updated')">Update Bus</button>
+<button onclick="alert('Report Generated')">Generate Report</button>
+<p>Admin manages buses, users, comments and reports.</p>`;
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,70 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>DOM Structure Analysis</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 30px;
+            background: #f2f5f9;
+        }
+        .container {
+            max-width: 650px;
+            margin: auto;
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+        }
+        pre {
+            background: #eeeeee;
+            padding: 15px;
+            white-space: pre-wrap;
+        }
+        button {
+            padding: 10px 15px;
+        }
+        #result {
+            background: #e5f6e9;
+            padding: 15px;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2>DOM Structure Analysis</h2>
+
+    <h3>Corrected DOM Example</h3>
+
+    <pre id="source"></pre>
+
+    <h3>Rendered Output</h3>
+    <div id="demo">
+        <p id="message">Hello World</p>
+    </div>
+
+    <button onclick="analyzeDOM()">Analyze DOM</button>
+    <div id="result">Click to analyze the DOM.</div>
+</div>
+
+<script>
+document.getElementById("source").textContent =
+`<div>
+  <p>Hello World</p>
+</div>`;
+
+function analyzeDOM() {
+    const paragraph = document.querySelector("#message");
+    const parent = paragraph.parentElement;
+
+    document.getElementById("result").innerHTML =
+        "<p>Paragraph element: Found</p>" +
+        "<p>Parent element: " + parent.tagName + "</p>" +
+        "<p>Text content: " + paragraph.textContent + "</p>" +
+        "<p>Status: The paragraph is properly closed.</p>";
+}
+</script>
+</body>
+</html>

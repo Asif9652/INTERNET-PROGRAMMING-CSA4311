@@ -1,0 +1,77 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>GET vs POST</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 30px;
+            background: #f2f5f9;
+        }
+        .container {
+            max-width: 650px;
+            margin: auto;
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+        }
+        input, button {
+            padding: 10px;
+            margin: 6px 0;
+        }
+        #output {
+            background: #e5f6e9;
+            padding: 15px;
+            margin-top: 15px;
+            overflow-wrap: anywhere;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2>GET vs POST Demonstration</h2>
+
+    <label>Username:</label><br>
+    <input id="username" value="admin"><br>
+
+    <label>Password (demo only):</label><br>
+    <input id="password" type="password" value="demo123"><br>
+
+    <button onclick="showGET()">Simulate GET</button>
+    <button onclick="showPOST()">Simulate POST</button>
+
+    <div id="output">Choose a method to see the result.</div>
+</div>
+
+<script>
+function showGET() {
+    const user = encodeURIComponent(
+        document.getElementById("username").value
+    );
+    const pass = encodeURIComponent(
+        document.getElementById("password").value
+    );
+
+    const url = "/login?user=" + user + "&pass=" + pass;
+
+    document.getElementById("output").textContent =
+        "Method: GET\n" +
+        "Example URL: " + url + "\n" +
+        "Data is visible in the URL and may appear in browser history or logs.";
+}
+
+function showPOST() {
+    const user = document.getElementById("username").value;
+
+    document.getElementById("output").textContent =
+        "Method: POST\n" +
+        "Example endpoint: /login\n" +
+        "Username: " + user + "\n" +
+        "Form data would be sent in the request body.\n" +
+        "This is a local simulation; no request was sent.";
+}
+</script>
+</body>
+</html>

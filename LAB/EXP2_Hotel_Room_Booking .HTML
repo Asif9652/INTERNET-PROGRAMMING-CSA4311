@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Hotel Booking</title>
+<style>
+body{font-family:Arial;background:#eee;text-align:center}
+header{background:#234;color:white;padding:20px}
+button,input{padding:10px;margin:5px}
+.room{background:white;margin:15px;padding:15px}
+</style>
+</head>
+<body>
+
+<header>
+<h1>🏨 Hotel Room Booking</h1>
+<button onclick="home()">Home</button>
+<button onclick="rooms()">Rooms</button>
+<button onclick="login()">Login</button>
+<button onclick="booking()">My Bookings</button>
+<button onclick="admin()">Admin</button>
+</header>
+
+<div id="app">
+<h2>Welcome to Our Hotel</h2>
+<p>Search and book your room easily.</p>
+</div>
+
+<script>
+function home(){
+app.innerHTML="<h2>Welcome to Our Hotel</h2><p>Comfortable rooms at best prices.</p>";
+}
+
+function rooms(){
+app.innerHTML=`
+<h2>Search Rooms</h2>
+<input placeholder="Destination">
+<input type="date"><input type="date">
+<input placeholder="Guests">
+<button onclick="alert('Room Available')">Check Availability</button>
+<div class="room"><h3>Single Room</h3><p>$50 | WiFi | AC</p>
+<button onclick="book()">Book Now</button></div>
+<div class="room"><h3>Double Room</h3><p>$80 | WiFi | AC</p>
+<button onclick="book()">Book Now</button></div>`;
+}
+
+function book(){
+alert("Room booked successfully!");
+}
+
+function login(){
+app.innerHTML=`
+<h2>User Login</h2>
+<input placeholder="Email">
+<input type="password" placeholder="Password">
+<button onclick="alert('Login Successful')">Login</button>
+`;
+}
+
+function booking(){
+app.innerHTML=`
+<h2>My Booking</h2>
+<p>Room: Double Room</p>
+<p>Date: 10-08-2026</p>
+<p>Status: Confirmed</p>
+<button onclick="alert('Booking Modified')">Modify</button>
+<button onclick="alert('Booking Cancelled')">Cancel</button>`;
+}
+
+function admin(){
+app.innerHTML=`
+<h2>Admin Panel</h2>
+<input placeholder="Room Type">
+<input placeholder="Quantity">
+<input placeholder="Price">
+<button onclick="alert('Room Updated')">Update Room</button>
+<button onclick="alert('Booking Cancelled')">Cancel Booking</button>
+<p>Admin can manage rooms, bookings and website pages.</p>`;
+}
+</script>
+</body>
+</html>
+

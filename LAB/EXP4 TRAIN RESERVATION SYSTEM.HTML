@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Train Reservation System</title>
+<style>
+body{font-family:Arial;background:#eee;text-align:center}
+header{background:#234;color:white;padding:20px}
+button,input,select{padding:10px;margin:5px}
+.train{background:white;margin:15px;padding:15px}
+</style>
+</head>
+<body>
+
+<header>
+<h1>🚆 Train Reservation System</h1>
+<button onclick="home()">Home</button>
+<button onclick="search()">Search Train</button>
+<button onclick="login()">Login</button>
+<button onclick="register()">Register</button>
+<button onclick="pnr()">Check PNR</button>
+<button onclick="admin()">Admin</button>
+</header>
+
+<div id="app">
+<h2>Welcome to Railway Reservation</h2>
+<p>Search trains and reserve your tickets online.</p>
+</div>
+
+<script>
+function home(){
+app.innerHTML="<h2>Welcome</h2><p>Book your train tickets easily.</p>";
+}
+
+function search(){
+app.innerHTML=`
+<h2>Search Train</h2>
+<input placeholder="Origin Station">
+<input placeholder="Destination Station">
+<input type="date">
+<select><option>AC</option><option>Sleeper</option><option>General</option></select>
+<button onclick="alert('Train Found')">Search</button>
+<div class="train"><h3>Express Train</h3>
+<p>Available Seats: 25</p><p>Fare: $50</p>
+<button onclick="book()">Book Ticket</button></div>`;
+}
+
+function book(){
+alert("Ticket Booked! PNR: TR123456");
+}
+
+function login(){
+app.innerHTML=`
+<h2>Passenger Login</h2>
+<input placeholder="Username">
+<input type="password" placeholder="Password">
+<button onclick="alert('Login Successful')">Login</button>`;
+}
+
+function register(){
+app.innerHTML=`
+<h2>Passenger Registration</h2>
+<input placeholder="Name"><input placeholder="Email">
+<input placeholder="Password">
+<button onclick="alert('Registration Successful')">Register</button>`;
+}
+
+function pnr(){
+app.innerHTML=`
+<h2>Check PNR Status</h2>
+<input placeholder="Enter PNR Number">
+<button onclick="alert('Status: Confirmed')">Check Status</button>
+<p>PNR Status: Confirmed / RAC / Waiting List</p>`;
+}
+
+function admin(){
+app.innerHTML=`
+<h2>Admin Panel</h2>
+<input placeholder="Train Name">
+<input placeholder="Train Number">
+<input placeholder="Available Seats">
+<button onclick="alert('Train Details Updated')">Update Train</button>
+<button onclick="alert('Refund Processed')">Process Refund</button>
+<p>Admin manages trains, fares, users, PNR and payments.</p>`;
+}
+</script>
+</body>
+</html>

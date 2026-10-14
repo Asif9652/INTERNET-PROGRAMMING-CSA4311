@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Flight Reservation System</title>
+<style>
+body{font-family:Arial;background:#eee;text-align:center}
+header{background:#234;color:white;padding:20px}
+button,input,select{padding:10px;margin:5px}
+.flight{background:white;margin:15px;padding:15px}
+</style>
+</head>
+<body>
+
+<header>
+<h1>✈️ Flight Reservation System</h1>
+<button onclick="home()">Home</button>
+<button onclick="search()">Search Flight</button>
+<button onclick="login()">Login</button>
+<button onclick="bookings()">My Ticket</button>
+<button onclick="status()">Booking Status</button>
+<button onclick="admin()">Admin</button>
+</header>
+
+<div id="app">
+<h2>Welcome to Flight Reservation</h2>
+<p>Search and book your flight tickets online.</p>
+</div>
+
+<script>
+function home(){
+app.innerHTML="<h2>Welcome</h2><p>Book your flight easily and securely.</p>";
+}
+
+function search(){
+app.innerHTML=`
+<h2>Search Flight</h2>
+<input placeholder="Destination">
+<input type="date">
+<select><option>Economy</option><option>Business</option></select>
+<button onclick="alert('Flight Found')">Search</button>
+<div class="flight"><h3>Air India</h3>
+<p>Chennai to Delhi</p><p>Seats Available: 20</p>
+<p>Fare: $150</p>
+<button onclick="book()">Book Ticket</button></div>`;
+}
+
+function book(){
+alert("Ticket Booked Successfully!");
+}
+
+function login(){
+app.innerHTML=`
+<h2>Customer Login</h2>
+<input placeholder="Email">
+<input type="password" placeholder="Password">
+<button onclick="alert('Login Successful')">Login</button>
+<p>Forgot Password?</p>`;
+}
+
+function bookings(){
+app.innerHTML=`
+<h2>My Ticket</h2>
+<p>Flight: Air India</p><p>Status: Confirmed</p>
+<button onclick="alert('Ticket Printed')">Print Ticket</button>
+<button onclick="alert('Ticket Cancelled')">Cancel Ticket</button>`;
+}
+
+function status(){
+app.innerHTML=`
+<h2>Booking Status</h2>
+<input placeholder="Booking ID">
+<button onclick="alert('Status: Confirmed')">Check Status</button>`;
+}
+
+function admin(){
+app.innerHTML=`
+<h2>Admin Panel</h2>
+<input placeholder="Flight Name">
+<input placeholder="Available Seats">
+<input placeholder="Flight Fare">
+<button onclick="alert('Flight Updated')">Update Flight</button>
+<button onclick="alert('Report Generated')">Admin Report</button>
+<p>Admin manages flights, seats, users and bookings.</p>`;
+}
+</script>
+</body>
+</html>

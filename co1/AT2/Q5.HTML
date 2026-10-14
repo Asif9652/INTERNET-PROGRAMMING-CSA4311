@@ -1,0 +1,87 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Browser-Server Communication</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 30px;
+            background: #f2f5f9;
+        }
+        .container {
+            max-width: 650px;
+            margin: auto;
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+        }
+        .step {
+            background: #e8f0fe;
+            padding: 12px;
+            margin: 8px 0;
+            border-radius: 6px;
+        }
+        button {
+            padding: 10px 15px;
+            cursor: pointer;
+        }
+        #status {
+            margin-top: 15px;
+            padding: 12px;
+            background: #e5f6e9;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2>Browser-Server Communication Flow</h2>
+
+    <div id="steps"></div>
+
+    <button onclick="startSimulation()">Start Simulation</button>
+    <button onclick="resetSimulation()">Reset</button>
+
+    <div id="status">Click Start Simulation.</div>
+</div>
+
+<script>
+const steps = [
+    "1. User enters a URL in the browser",
+    "2. DNS lookup resolves the domain name",
+    "3. Browser sends an HTTP request",
+    "4. Server processes the request",
+    "5. Server returns an HTTP response",
+    "6. Browser renders the web page"
+];
+
+function renderSteps(current = 0) {
+    document.getElementById("steps").innerHTML =
+        steps.map((step, index) =>
+            `<div class="step" style="${
+                index < current
+                    ? "background:#c8f7d2"
+                    : ""
+            }">${step}</div>`
+        ).join("");
+}
+
+function startSimulation() {
+    renderSteps(steps.length);
+
+    document.getElementById("status").textContent =
+        "Simulation complete! All six communication stages have been demonstrated.";
+}
+
+function resetSimulation() {
+    renderSteps();
+
+    document.getElementById("status").textContent =
+        "Simulation reset. Click Start Simulation.";
+}
+
+renderSteps();
+</script>
+</body>
+</html>
