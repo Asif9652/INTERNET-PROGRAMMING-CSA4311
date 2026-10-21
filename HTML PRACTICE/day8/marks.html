@@ -1,0 +1,81 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Student Details</title>
+</head>
+<body>
+
+    <h2>Student Details and Marks</h2>
+
+    <form id="studentForm">
+        Name:
+        <input type="text" id="name" required>
+        <br><br>
+
+        Roll Number:
+        <input type="number" id="roll" required>
+        <br><br>
+
+        Java Marks:
+        <input type="number" id="java" min="0" max="100" required>
+        <br><br>
+
+        Python Marks:
+        <input type="number" id="python" min="0" max="100" required>
+        <br><br>
+
+        DBMS Marks:
+        <input type="number" id="dbms" min="0" max="100" required>
+        <br><br>
+
+        <button type="submit">Submit</button>
+    </form>
+
+    <h2>Student Result</h2>
+    <div id="output"></div>
+
+    <script>
+        document.getElementById("studentForm")
+        .addEventListener("submit", function(event) {
+            event.preventDefault();
+
+            // Store input details in a JavaScript object
+            const student = {
+                name: document.getElementById("name").value,
+                rollNo: document.getElementById("roll").value,
+                marks: {
+                    Java: Number(document.getElementById("java").value),
+                    Python: Number(document.getElementById("python").value),
+                    DBMS: Number(document.getElementById("dbms").value)
+                }
+            };
+
+            // Convert object into JSON
+            const jsonData = JSON.stringify(student);
+
+            // Convert JSON back into an object
+            const data = JSON.parse(jsonData);
+
+            let total = data.marks.Java +
+                        data.marks.Python +
+                        data.marks.DBMS;
+
+            let average = total / 3;
+
+            document.getElementById("output").innerHTML =
+                "Name: " + data.name + "<br>" +
+                "Roll Number: " + data.rollNo + "<br>" +
+                "Java Marks: " + data.marks.Java + "<br>" +
+                "Python Marks: " + data.marks.Python + "<br>" +
+                "DBMS Marks: " + data.marks.DBMS + "<br>" +
+                "Total Marks: " + total + " / 300<br>" +
+                "Average: " + average.toFixed(2) + "%<br>" +
+                "Result: " +
+                (Object.values(data.marks).every(m => m >= 35)
+                    ? "Pass" : "Fail");
+        });
+    </script>
+
+</body>
+</html>

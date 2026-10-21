@@ -1,0 +1,804 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TechSavvy Online Shopping</title>
+
+<style>
+* { box-sizing: border-box; }
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f4f6f9;
+    color: #222;
+}
+header {
+    background: #172554;
+    color: white;
+    padding: 18px 5%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+header h1 { margin: 0; }
+nav { display: flex; flex-wrap: wrap; gap: 8px; }
+button {
+    border: none;
+    border-radius: 5px;
+    padding: 10px 14px;
+    cursor: pointer;
+    background: #2563eb;
+    color: white;
+}
+button:hover { opacity: .85; }
+nav button { background: #334155; }
+.container { padding: 22px 5%; }
+.toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+input, select, textarea {
+    padding: 10px;
+    border: 1px solid #bbb;
+    border-radius: 5px;
+    max-width: 100%;
+}
+.toolbar input { flex: 1; min-width: 180px; }
+.products {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    gap: 18px;
+}
+.card {
+    background: white;
+    padding: 18px;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px #0001;
+}
+.product-icon { font-size: 55px; text-align: center; }
+.card h3 { margin-bottom: 8px; }
+.price { color: #047857; font-size: 20px; font-weight: bold; }
+.stock { color: #64748b; font-size: 14px; }
+section { margin-bottom: 30px; }
+.panel {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 18px;
+    overflow-wrap: anywhere;
+}
+.hidden { display: none !important; }
+.row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    border-bottom: 1px solid #ddd;
+    padding: 12px 0;
+}
+.danger { background: #dc2626; }
+.success { background: #047857; }
+footer {
+    text-align: center;
+    padding: 20px;
+    background: #172554;
+    color: white;
+}
+label { display: block; margin: 10px 0 5px; }
+#message { color: #047857; font-weight: bold; }
+@media(max-width:600px) {
+    header { align-items: flex-start; }
+    .container { padding: 15px; }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <h1>🛍️ TechSavvy</h1>
+    <nav>
+        <button onclick="showPage('home')">Home</button>
+        <button onclick="showPage('cart')">Cart (<span id="cartCount">0</span>)</button>
+        <button onclick="showPage('orders')">My Orders</button>
+        <button onclick="showPage('account')">Account</button>
+        <button onclick="showPage('admin')">Admin</button>
+    </nav>
+</header>
+
+<main class="container">
+
+    <p id="message"></p>
+
+    <!-- HOME PAGE -->
+    <section id="homePage">
+        <h2>Welcome to TechSavvy</h2>
+        <p>Shop smartphones, laptops, accessories and more.</p>
+
+        <div class="toolbar">
+            <input id="search" placeholder="Search products..."
+                   oninput="renderProducts()">
+
+            <select id="category" onchange="renderProducts()">
+                <option value="All">All Categories</option>
+                <option value="Mobiles">Mobiles</option>
+                <option value="Laptops">Laptops</option>
+                <option value="Accessories">Accessories</option>
+            </select>
+
+            <select id="sort" onchange="renderProducts()">
+                <option value="default">Sort by</option>
+                <option value="low">Price: Low to High</option>
+                <option value="high">Price: High to Low</option>
+                <option value="popular">Popular First</option>
+            </select>
+        </div>
+
+        <h3>Available Products</h3>
+        <div id="productList" class="products"></div>
+    </section>
+
+    <!-- PRODUCT DETAILS -->
+    <section id="detailsPage" class="hidden">
+        <button onclick="showPage('home')">← Back to Products</button>
+        <div id="productDetails" class="panel"></div>
+    </section>
+
+    <!-- CART PAGE -->
+    <section id="cartPage" class="hidden">
+        <h2>Shopping Cart</h2>
+        <div id="cartItems" class="panel"></div>
+        <h3 id="cartTotal">Total: ₹0</h3>
+        <button class="success" onclick="checkout()">Proceed to Checkout</button>
+        <button onclick="showPage('home')">Continue Shopping</button>
+    </section>
+
+    <!-- CHECKOUT PAGE -->
+    <section id="checkoutPage" class="hidden">
+        <h2>Checkout</h2>
+        <div class="panel">
+            <label>Customer Name</label>
+            <input id="customerName" placeholder="Enter your name">
+
+            <label>Email</label>
+            <input id="customerEmail" type="email"
+                   placeholder="Enter email">
+
+            <label>Delivery Address</label>
+            <textarea id="address" placeholder="Enter delivery address"></textarea>
+
+            <label>Payment Method (Demo)</label>
+            <select id="payment">
+                <option>Cash on Delivery</option>
+                <option>UPI (Demo)</option>
+                <option>Card (Demo)</option>
+            </select>
+
+            <p id="checkoutTotal"></p>
+            <button class="success" onclick="placeOrder()">Place Order</button>
+            <button onclick="showPage('cart')">Back to Cart</button>
+        </div>
+    </section>
+
+    <!-- ORDERS PAGE -->
+    <section id="ordersPage" class="hidden">
+        <h2>Order History and Status</h2>
+        <div id="orderList"></div>
+    </section>
+
+    <!-- ACCOUNT PAGE -->
+    <section id="accountPage" class="hidden">
+        <h2>Register / Login</h2>
+        <div class="panel">
+            <label>Name</label>
+            <input id="accountName" placeholder="Enter your name">
+
+            <label>Email</label>
+            <input id="accountEmail" type="email"
+                   placeholder="Enter your email">
+
+            <label>Password</label>
+            <input id="accountPassword" type="password"
+                   placeholder="Enter a password">
+
+            <button onclick="registerUser()">Register</button>
+            <button onclick="loginUser()">Login</button>
+            <button class="danger" onclick="logoutUser()">Logout</button>
+
+            <p id="loginStatus">Not logged in</p>
+        </div>
+    </section>
+
+    <!-- ADMIN PAGE -->
+    <section id="adminPage" class="hidden">
+        <h2>Admin Product Management</h2>
+        <div class="panel">
+            <p>Demo admin password: <b>admin123</b></p>
+
+            <label>Admin Password</label>
+            <input id="adminPassword" type="password"
+                   placeholder="Enter admin password">
+            <button onclick="adminLogin()">Admin Login</button>
+
+            <div id="adminControls" class="hidden">
+                <h3>Add a Product</h3>
+
+                <label>Product Name</label>
+                <input id="newName" placeholder="Product name">
+
+                <label>Category</label>
+                <select id="newCategory">
+                    <option>Mobiles</option>
+                    <option>Laptops</option>
+                    <option>Accessories</option>
+                </select>
+
+                <label>Price (₹)</label>
+                <input id="newPrice" type="number" min="1"
+                       placeholder="Price">
+
+                <label>Stock Quantity</label>
+                <input id="newStock" type="number" min="0"
+                       placeholder="Stock">
+
+                <label>Description</label>
+                <textarea id="newDescription"
+                          placeholder="Product description"></textarea>
+
+                <button onclick="addProduct()">Add Product</button>
+
+                <h3>Manage Products</h3>
+                <div id="adminProducts"></div>
+
+                <h3>Customer Orders</h3>
+                <div id="adminOrders"></div>
+            </div>
+        </div>
+    </section>
+
+</main>
+
+<footer>
+    <p>TechSavvy Online Shopping System | Internet Programming Lab</p>
+</footer>
+
+<script>
+// JSON-style product data
+const initialProducts = [
+    {id:1, name:"Smartphone", category:"Mobiles", price:15000,
+     stock:10, icon:"📱", popular:10,
+     description:"Powerful smartphone for daily use."},
+    {id:2, name:"Laptop", category:"Laptops", price:50000,
+     stock:5, icon:"💻", popular:9,
+     description:"Laptop suitable for study and work."},
+    {id:3, name:"Headphones", category:"Accessories", price:1500,
+     stock:20, icon:"🎧", popular:8,
+     description:"Comfortable headphones with clear sound."},
+    {id:4, name:"Smart Watch", category:"Accessories", price:2500,
+     stock:12, icon:"⌚", popular:7,
+     description:"Smart watch for everyday use."},
+    {id:5, name:"Tablet", category:"Mobiles", price:12000,
+     stock:8, icon:"📲", popular:6,
+     description:"Portable tablet for learning and entertainment."},
+    {id:6, name:"Keyboard", category:"Accessories", price:800,
+     stock:15, icon:"⌨️", popular:5,
+     description:"Keyboard for computer users."}
+];
+
+function loadData(key, fallback) {
+    try {
+        const saved = localStorage.getItem(key);
+        return saved ? JSON.parse(saved) : fallback;
+    } catch (error) {
+        return fallback;
+    }
+}
+
+let products = loadData("ts_products", initialProducts);
+let cart = loadData("ts_cart", []);
+let orders = loadData("ts_orders", []);
+let users = loadData("ts_users", []);
+let currentUser = loadData("ts_currentUser", null);
+let isAdmin = false;
+
+function saveData() {
+    localStorage.setItem("ts_products", JSON.stringify(products));
+    localStorage.setItem("ts_cart", JSON.stringify(cart));
+    localStorage.setItem("ts_orders", JSON.stringify(orders));
+    localStorage.setItem("ts_users", JSON.stringify(users));
+    localStorage.setItem("ts_currentUser", JSON.stringify(currentUser));
+}
+
+function showMessage(message) {
+    document.getElementById("message").textContent = message;
+}
+
+function showPage(page) {
+    const pages = [
+        "home", "details", "cart", "checkout",
+        "orders", "account", "admin"
+    ];
+
+    pages.forEach(p => {
+        document.getElementById(p + "Page")
+            .classList.toggle("hidden", p !== page);
+    });
+
+    if (page === "cart") renderCart();
+    if (page === "orders") renderOrders();
+    if (page === "admin") renderAdmin();
+    if (page === "account") updateAccount();
+    if (page === "home") renderProducts();
+
+    window.scrollTo(0, 0);
+}
+
+function renderProducts() {
+    const search = document.getElementById("search").value.toLowerCase();
+    const category = document.getElementById("category").value;
+    const sort = document.getElementById("sort").value;
+
+    let list = products.filter(p =>
+        p.name.toLowerCase().includes(search) &&
+        (category === "All" || p.category === category)
+    );
+
+    if (sort === "low") list.sort((a,b) => a.price - b.price);
+    if (sort === "high") list.sort((a,b) => b.price - a.price);
+    if (sort === "popular") list.sort((a,b) => b.popular - a.popular);
+
+    document.getElementById("productList").innerHTML = list.length
+        ? list.map(p => `
+        <div class="card">
+            <div class="product-icon">${p.icon || "🛍️"}</div>
+            <h3>${escapeHTML(p.name)}</h3>
+            <p>${escapeHTML(p.category)}</p>
+            <p class="price">₹${p.price.toLocaleString("en-IN")}</p>
+            <p class="stock">Stock: ${p.stock}</p>
+            <button onclick="viewDetails(${p.id})">View Details</button>
+            <button onclick="addToCart(${p.id})"
+                ${p.stock <= 0 ? "disabled" : ""}>Add to Cart</button>
+        </div>`).join("")
+        : "<p>No products found.</p>";
+}
+
+function viewDetails(id) {
+    const p = products.find(item => item.id === id);
+    if (!p) return;
+
+    document.getElementById("productDetails").innerHTML = `
+        <div class="product-icon">${p.icon || "🛍️"}</div>
+        <h2>${escapeHTML(p.name)}</h2>
+        <p>Category: ${escapeHTML(p.category)}</p>
+        <p class="price">₹${p.price.toLocaleString("en-IN")}</p>
+        <p>${escapeHTML(p.description)}</p>
+        <p>Available stock: ${p.stock}</p>
+        <button onclick="addToCart(${p.id})">Add to Cart</button>
+    `;
+    showPage("details");
+}
+
+function addToCart(id) {
+    const p = products.find(item => item.id === id);
+    if (!p || p.stock <= 0) {
+        showMessage("Product is out of stock.");
+        return;
+    }
+
+    const item = cart.find(i => i.id === id);
+    if (item) {
+        if (item.qty >= p.stock) {
+            showMessage("Maximum available stock reached.");
+            return;
+        }
+        item.qty++;
+    } else {
+        cart.push({id:id, qty:1});
+    }
+
+    saveData();
+    updateCartCount();
+    showMessage(p.name + " added to cart.");
+}
+
+function updateCartCount() {
+    document.getElementById("cartCount").textContent =
+        cart.reduce((sum, item) => sum + item.qty, 0);
+}
+
+function renderCart() {
+    const container = document.getElementById("cartItems");
+    let total = 0;
+
+    if (!cart.length) {
+        container.innerHTML = "<p>Your cart is empty.</p>";
+    } else {
+        container.innerHTML = cart.map(item => {
+            const p = products.find(x => x.id === item.id);
+            if (!p) return "";
+            total += p.price * item.qty;
+
+            return `
+            <div class="row">
+                <div>
+                    <b>${escapeHTML(p.name)}</b><br>
+                    ₹${p.price.toLocaleString("en-IN")} each
+                </div>
+                <div>
+                    <button onclick="changeQty(${p.id},-1)">−</button>
+                    ${item.qty}
+                    <button onclick="changeQty(${p.id},1)">+</button>
+                    <button class="danger"
+                        onclick="removeFromCart(${p.id})">Remove</button>
+                </div>
+            </div>`;
+        }).join("");
+    }
+
+    document.getElementById("cartTotal").textContent =
+        "Total: ₹" + total.toLocaleString("en-IN");
+}
+
+function changeQty(id, change) {
+    const item = cart.find(i => i.id === id);
+    const p = products.find(i => i.id === id);
+    if (!item || !p) return;
+
+    const newQty = item.qty + change;
+    if (newQty > p.stock) {
+        showMessage("Not enough stock available.");
+        return;
+    }
+
+    if (newQty <= 0) {
+        removeFromCart(id);
+        return;
+    }
+
+    item.qty = newQty;
+    saveData();
+    updateCartCount();
+    renderCart();
+}
+
+function removeFromCart(id) {
+    cart = cart.filter(item => item.id !== id);
+    saveData();
+    updateCartCount();
+    renderCart();
+    showMessage("Item removed from cart.");
+}
+
+function checkout() {
+    if (!cart.length) {
+        showMessage("Please add products before checkout.");
+        return;
+    }
+
+    const unavailable = cart.some(item => {
+        const p = products.find(x => x.id === item.id);
+        return !p || p.stock < item.qty;
+    });
+
+    if (unavailable) {
+        showMessage("Some items have insufficient stock.");
+        return;
+    }
+
+    if (currentUser) {
+        document.getElementById("customerName").value = currentUser.name;
+        document.getElementById("customerEmail").value = currentUser.email;
+    }
+
+    let total = cart.reduce((sum, item) => {
+        const p = products.find(x => x.id === item.id);
+        return sum + p.price * item.qty;
+    }, 0);
+
+    document.getElementById("checkoutTotal").textContent =
+        "Order Total: ₹" + total.toLocaleString("en-IN");
+
+    showPage("checkout");
+}
+
+function placeOrder() {
+    const name = document.getElementById("customerName").value.trim();
+    const email = document.getElementById("customerEmail").value.trim();
+    const address = document.getElementById("address").value.trim();
+    const payment = document.getElementById("payment").value;
+
+    if (!name || !email || !address) {
+        showMessage("Please enter name, email and delivery address.");
+        return;
+    }
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        showMessage("Please enter a valid email address.");
+        return;
+    }
+
+    for (const item of cart) {
+        const p = products.find(x => x.id === item.id);
+        if (!p || p.stock < item.qty) {
+            showMessage("Stock changed. Please review your cart.");
+            return;
+        }
+    }
+
+    const orderItems = cart.map(item => {
+        const p = products.find(x => x.id === item.id);
+        return {
+            id: p.id,
+            name: p.name,
+            price: p.price,
+            qty: item.qty
+        };
+    });
+
+    const total = orderItems.reduce(
+        (sum, item) => sum + item.price * item.qty, 0
+    );
+
+    cart.forEach(item => {
+        products.find(p => p.id === item.id).stock -= item.qty;
+    });
+
+    const order = {
+        id: Date.now(),
+        customer: name,
+        email: email,
+        address: address,
+        payment: payment,
+        items: orderItems,
+        total: total,
+        status: "Placed",
+        date: new Date().toLocaleString()
+    };
+
+    orders.unshift(order);
+    cart = [];
+    saveData();
+    updateCartCount();
+    showMessage("Order placed successfully! Order ID: " + order.id);
+    showPage("orders");
+}
+
+function renderOrders() {
+    const list = document.getElementById("orderList");
+
+    if (!orders.length) {
+        list.innerHTML = "<div class='panel'>No orders yet.</div>";
+        return;
+    }
+
+    const visibleOrders = currentUser
+        ? orders.filter(o => o.email === currentUser.email)
+        : orders;
+
+    list.innerHTML = visibleOrders.length
+        ? visibleOrders.map(o => `
+        <div class="panel">
+            <h3>Order #${o.id}</h3>
+            <p>Date: ${escapeHTML(o.date)}</p>
+            <p>Customer: ${escapeHTML(o.customer)}</p>
+            <p>Items: ${o.items.map(i =>
+                escapeHTML(i.name) + " × " + i.qty).join(", ")}</p>
+            <p>Total: ₹${o.total.toLocaleString("en-IN")}</p>
+            <p>Payment: ${escapeHTML(o.payment)}</p>
+            <p><b>Status: ${escapeHTML(o.status)}</b></p>
+        </div>`).join("")
+        : "<div class='panel'>No orders found for this account.</div>";
+}
+
+// Registration and login (demonstration only)
+function registerUser() {
+    const name = document.getElementById("accountName").value.trim();
+    const email = document.getElementById("accountEmail").value.trim().toLowerCase();
+    const password = document.getElementById("accountPassword").value;
+
+    if (!name || !email || !password) {
+        showMessage("Fill in all registration fields.");
+        return;
+    }
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        showMessage("Enter a valid email.");
+        return;
+    }
+
+    if (users.some(u => u.email === email)) {
+        showMessage("This email is already registered.");
+        return;
+    }
+
+    users.push({name, email, password});
+    saveData();
+    showMessage("Registration successful. You can now log in.");
+}
+
+function loginUser() {
+    const email = document.getElementById("accountEmail").value.trim().toLowerCase();
+    const password = document.getElementById("accountPassword").value;
+    const user = users.find(u => u.email === email && u.password === password);
+
+    if (!user) {
+        showMessage("Invalid email or password. Please register first.");
+        return;
+    }
+
+    currentUser = {name:user.name, email:user.email};
+    saveData();
+    updateAccount();
+    showMessage("Welcome, " + user.name + "!");
+}
+
+function logoutUser() {
+    currentUser = null;
+    saveData();
+    updateAccount();
+    showMessage("Logged out successfully.");
+}
+
+function updateAccount() {
+    document.getElementById("loginStatus").textContent = currentUser
+        ? "Logged in as " + currentUser.name + " (" + currentUser.email + ")"
+        : "Not logged in";
+}
+
+// Admin product management
+function adminLogin() {
+    if (document.getElementById("adminPassword").value !== "admin123") {
+        showMessage("Incorrect admin password.");
+        return;
+    }
+
+    isAdmin = true;
+    document.getElementById("adminControls").classList.remove("hidden");
+    renderAdmin();
+    showMessage("Admin login successful.");
+}
+
+function addProduct() {
+    if (!isAdmin) return;
+
+    const name = document.getElementById("newName").value.trim();
+    const category = document.getElementById("newCategory").value;
+    const price = Number(document.getElementById("newPrice").value);
+    const stock = Number(document.getElementById("newStock").value);
+    const description = document.getElementById("newDescription").value.trim();
+
+    if (!name || !description || !Number.isFinite(price) ||
+        price <= 0 || !Number.isInteger(stock) || stock < 0) {
+        showMessage("Enter valid product details and stock.");
+        return;
+    }
+
+    products.push({
+        id: products.length
+            ? Math.max(...products.map(p => p.id)) + 1 : 1,
+        name, category, price, stock, description,
+        icon: "🛍️", popular: 0
+    });
+
+    saveData();
+    renderProducts();
+    renderAdmin();
+
+    ["newName", "newPrice", "newStock", "newDescription"].forEach(id => {
+        document.getElementById(id).value = "";
+    });
+
+    showMessage("Product added successfully.");
+}
+
+function deleteProduct(id) {
+    if (!isAdmin) return;
+    products = products.filter(p => p.id !== id);
+    cart = cart.filter(i => i.id !== id);
+    saveData();
+    updateCartCount();
+    renderProducts();
+    renderAdmin();
+    showMessage("Product removed.");
+}
+
+function editPrice(id) {
+    if (!isAdmin) return;
+    const p = products.find(p => p.id === id);
+    const price = prompt("Enter new price:", p.price);
+
+    if (price === null) return;
+    const value = Number(price);
+
+    if (!Number.isFinite(value) || value <= 0) {
+        showMessage("Enter a valid price.");
+        return;
+    }
+
+    p.price = value;
+    saveData();
+    renderProducts();
+    renderAdmin();
+    showMessage("Price updated.");
+}
+
+function editDescription(id) {
+    if (!isAdmin) return;
+    const p = products.find(p => p.id === id);
+    const description = prompt("Enter new description:", p.description);
+
+    if (description === null || !description.trim()) return;
+    p.description = description.trim();
+    saveData();
+    renderAdmin();
+    showMessage("Description updated.");
+}
+
+function updateOrderStatus(id, status) {
+    if (!isAdmin) return;
+    const order = orders.find(o => o.id === id);
+    if (!order) return;
+
+    order.status = status;
+    saveData();
+    renderAdmin();
+    renderOrders();
+    showMessage("Order status updated.");
+}
+
+function renderAdmin() {
+    if (!isAdmin) return;
+
+    document.getElementById("adminProducts").innerHTML = products.map(p => `
+        <div class="row">
+            <div>
+                <b>${escapeHTML(p.name)}</b><br>
+                ₹${p.price} | Stock: ${p.stock}
+            </div>
+            <div>
+                <button onclick="editPrice(${p.id})">Edit Price</button>
+                <button onclick="editDescription(${p.id})">Edit Description</button>
+                <button class="danger" onclick="deleteProduct(${p.id})">Delete</button>
+            </div>
+        </div>`).join("");
+
+    document.getElementById("adminOrders").innerHTML = orders.length
+        ? orders.map(o => `
+        <div class="row">
+            <div>
+                <b>Order #${o.id}</b><br>
+                ${escapeHTML(o.customer)} — ₹${o.total}<br>
+                Status: ${escapeHTML(o.status)}
+            </div>
+            <select onchange="updateOrderStatus(${o.id}, this.value)">
+                ${["Placed","Processing","Shipped","Delivered","Cancelled"]
+                    .map(s => `<option ${o.status === s ? "selected" : ""}>${s}</option>`)
+                    .join("")}
+            </select>
+        </div>`).join("")
+        : "<p>No customer orders yet.</p>";
+}
+
+// Prevent product/customer text from being interpreted as HTML.
+function escapeHTML(value) {
+    return String(value).replace(/[&<>"']/g, ch => ({
+        "&":"&amp;", "<":"&lt;", ">":"&gt;",
+        '"':"&quot;", "'":"&#39;"
+    }[ch]));
+}
+
+// Initialize the application
+renderProducts();
+updateCartCount();
+updateAccount();
+</script>
+
+</body>
+</html>
