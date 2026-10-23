@@ -1,0 +1,122 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>BlossomGifts</title>
+    <style>
+        body {
+            font-family: Arial;
+            background: #fff0f5;
+            text-align: center;
+            padding: 20px;
+        }
+        h1 { color: #c2185b; }
+        .product {
+            background: white;
+            padding: 15px;
+            margin: 15px auto;
+            max-width: 280px;
+            border-radius: 12px;
+            box-shadow: 0 3px 10px #ddd;
+        }
+        button {
+            background: #c2185b;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        input, select {
+            padding: 9px;
+            margin: 6px;
+        }
+    </style>
+</head>
+<body>
+
+<h1>🌸 BlossomGifts 🌸</h1>
+<p>Flowers and Gifts for Every Occasion</p>
+
+<h2>Our Products</h2>
+
+<div class="product">
+    <h3>🌹 Rose Bouquet</h3>
+    <p>Category: Flowers</p>
+    <p>Price: ₹500</p>
+    <button onclick="addToCart('Rose Bouquet', 500)">
+        Add to Cart
+    </button>
+</div>
+
+<div class="product">
+    <h3>🎁 Gift Basket</h3>
+    <p>Category: Gifts</p>
+    <p>Price: ₹800</p>
+    <button onclick="addToCart('Gift Basket', 800)">
+        Add to Cart
+    </button>
+</div>
+
+<div class="product">
+    <h3>🍫 Chocolate Box</h3>
+    <p>Category: Chocolates</p>
+    <p>Price: ₹300</p>
+    <button onclick="addToCart('Chocolate Box', 300)">
+        Add to Cart
+    </button>
+</div>
+
+<h2>🛒 Shopping Cart</h2>
+<p id="cart">No items added</p>
+<p id="total">Total: ₹0</p>
+
+<h2>Delivery Details</h2>
+<input id="customer" placeholder="Customer Name"><br>
+<input id="address" placeholder="Delivery Address"><br>
+<label>Delivery Date:</label>
+<input type="date" id="date"><br>
+<button onclick="placeOrder()">Place Order</button>
+
+<h3 id="result"></h3>
+
+<script>
+    let items = [];
+    let total = 0;
+
+    function addToCart(name, price) {
+        items.push(name);
+        total += price;
+
+        document.getElementById("cart").innerText =
+            items.join(", ");
+        document.getElementById("total").innerText =
+            "Total: ₹" + total;
+    }
+
+    function placeOrder() {
+        let customer = document.getElementById("customer").value;
+        let address = document.getElementById("address").value;
+        let date = document.getElementById("date").value;
+
+        if (items.length === 0 || customer === "" ||
+            address === "" || date === "") {
+            alert("Please complete all details and add a product.");
+            return;
+        }
+
+        document.getElementById("result").innerHTML =
+            "Order Placed Successfully! 🌸<br>" +
+            "Customer: " + customer + "<br>" +
+            "Delivery Date: " + date + "<br>" +
+            "Total Amount: ₹" + total;
+
+        items = [];
+        total = 0;
+        document.getElementById("cart").innerText = "No items added";
+        document.getElementById("total").innerText = "Total: ₹0";
+    }
+</script>
+
+</body>
+</html>

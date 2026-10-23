@@ -1,0 +1,162 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>EasyToll</title>
+    <style>
+        body {
+            font-family: Arial;
+            background: #eef4ff;
+            text-align: center;
+            padding: 20px;
+        }
+        h1 { color: #174ea6; }
+        .box {
+            background: white;
+            padding: 18px;
+            margin: 15px auto;
+            max-width: 350px;
+            border-radius: 12px;
+            box-shadow: 0 3px 10px #ccc;
+        }
+        input, select, button {
+            padding: 10px;
+            margin: 6px;
+            width: 90%;
+            box-sizing: border-box;
+        }
+        button {
+            background: #174ea6;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<h1>🚘 EasyToll</h1>
+<p>Pay Toll in Advance and Save Time</p>
+
+<div class="box">
+    <h3>User Login</h3>
+    <input id="username" placeholder="Enter username">
+    <button onclick="login()">Login</button>
+    <p id="loginResult"></p>
+</div>
+
+<div class="box">
+    <h3>eWallet</h3>
+    <h3 id="balance">Balance: ₹0</h3>
+    <input id="amount" type="number" placeholder="Enter amount">
+    <button onclick="addMoney()">Add Money</button>
+</div>
+
+<div class="box">
+    <h3>Buy Toll eTicket</h3>
+    <input id="vehicle" placeholder="Vehicle Number">
+    <select id="toll">
+        <option value="100">Chennai Toll - ₹100</option>
+        <option value="150">Highway Toll - ₹150</option>
+        <option value="200">Expressway Toll - ₹200</option>
+    </select>
+    <button onclick="buyTicket()">Buy Ticket</button>
+    <p id="ticketResult"></p>
+</div>
+
+<div class="box">
+    <h3>Toll Pass</h3>
+    <button onclick="applyPass()">Apply for Toll Pass</button>
+    <p id="passResult"></p>
+</div>
+
+<div class="box">
+    <h3>Toll Gate Verification</h3>
+    <input id="ticketId" placeholder="Enter Ticket / Pass ID">
+    <button onclick="verifyTicket()">Verify Ticket</button>
+    <p id="verifyResult"></p>
+</div>
+
+<script>
+    let wallet = 0;
+    let ticketCount = 0;
+    let passId = "";
+
+    function login() {
+        let name = document.getElementById("username").value.trim();
+
+        document.getElementById("loginResult").innerText =
+            name ? "Welcome, " + name + "!" :
+            "Please enter your username.";
+    }
+
+    function addMoney() {
+        let amount = Number(document.getElementById("amount").value);
+
+        if (amount <= 0) {
+            alert("Enter a valid amount.");
+            return;
+        }
+
+        wallet += amount;
+        document.getElementById("balance").innerText =
+            "Balance: ₹" + wallet;
+        document.getElementById("amount").value = "";
+    }
+
+    function buyTicket() {
+        let vehicle = document.getElementById("vehicle").value.trim();
+        let toll = Number(document.getElementById("toll").value);
+
+        if (!vehicle) {
+            alert("Enter vehicle number.");
+            return;
+        }
+
+        if (wallet < toll) {
+            alert("Insufficient wallet balance. Please add money.");
+            return;
+        }
+
+        wallet -= toll;
+        ticketCount++;
+
+        let id = "ET" + Date.now().toString().slice(-6);
+
+        document.getElementById("balance").innerText =
+            "Balance: ₹" + wallet;
+
+        document.getElementById("ticketResult").innerHTML =
+            "Ticket Purchased Successfully!<br>" +
+            "Ticket ID: " + id + "<br>" +
+            "Vehicle: " + vehicle + "<br>" +
+            "Toll Paid: ₹" + toll;
+
+        document.getElementById("ticketId").value = id;
+    }
+
+    function applyPass() {
+        passId = "PASS" + Date.now().toString().slice(-6);
+
+        document.getElementById("passResult").innerHTML =
+            "Pass application submitted.<br>" +
+            "Demo Pass ID: " + passId + "<br>" +
+            "Status: Pending Approval";
+    }
+
+    function verifyTicket() {
+        let id = document.getElementById("ticketId").value.trim();
+
+        if (id && (id.startsWith("ET") || id === passId)) {
+            document.getElementById("verifyResult").innerText =
+                "Demo ID format accepted. Check actual payment and approval before entry.";
+        } else {
+            document.getElementById("verifyResult").innerText =
+                "Invalid ticket or pass ID.";
+        }
+    }
+</script>
+
+</body>
+</html>

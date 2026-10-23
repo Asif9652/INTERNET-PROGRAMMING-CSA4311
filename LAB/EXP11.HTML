@@ -1,0 +1,438 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HomeFinder | Find Your Happy Place</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--green:#176b52;--light:#e9f5ee;--dark:#17352b;--gold:#f2b84b}
+body{font-family:Arial,sans-serif;background:#f7f9f7;color:#26372f}
+header{display:flex;align-items:center;justify-content:space-between;padding:18px 7%;background:white;position:sticky;top:0;z-index:5;box-shadow:0 2px 12px #0000000b}
+.logo{font-size:25px;font-weight:800;color:var(--green)}
+.logo span{color:var(--gold)}
+nav{display:flex;gap:20px;align-items:center}
+nav a{color:#34483d;text-decoration:none;font-size:14px}
+button{border:0;border-radius:9px;padding:11px 16px;cursor:pointer;font-weight:bold;transition:.2s}
+button:hover{transform:translateY(-2px);opacity:.9}
+.primary{background:var(--green);color:white}
+.secondary{background:var(--light);color:var(--green)}
+.hero{padding:65px 7% 55px;background:linear-gradient(110deg,#e6f3e9,#f8f4e8)}
+.hero-grid{display:grid;grid-template-columns:1fr 1fr;align-items:center;gap:35px}
+.eyebrow{color:var(--green);font-weight:bold;letter-spacing:2px;font-size:12px}
+h1{font-size:clamp(36px,5vw,60px);line-height:1.1;margin:17px 0}
+h1 span{color:var(--green)}
+.hero p{color:#617167;line-height:1.7;max-width:480px}
+.hero img{width:100%;height:310px;object-fit:cover;border-radius:24px;box-shadow:0 15px 35px #244b3020}
+.stats{display:flex;gap:30px;margin-top:28px;flex-wrap:wrap}
+.stats strong{display:block;font-size:22px;color:var(--green)}
+.stats small{color:#63756b}
+.searchbox{background:white;margin:-25px 7% 35px;position:relative;padding:22px;border-radius:16px;box-shadow:0 8px 30px #00000012}
+.searchbox h3{margin-bottom:15px}
+.filters{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+input,select{width:100%;padding:12px;border:1px solid #dce5dd;border-radius:8px;background:white;outline-color:var(--green);margin-top:6px}
+label{font-size:12px;color:#526359;font-weight:bold}
+.filter-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+section{padding:30px 7%}
+.section-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:22px;flex-wrap:wrap}
+.section-head h2{font-size:27px;color:var(--dark)}
+.section-head p{color:#77857c;font-size:14px;margin-top:7px}
+.cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px}
+.card{background:white;border-radius:15px;overflow:hidden;box-shadow:0 5px 22px #193e2810;transition:.25s}
+.card:hover{transform:translateY(-5px);box-shadow:0 12px 25px #193e2817}
+.photo{height:200px;position:relative}
+.photo img{width:100%;height:100%;object-fit:cover}
+.tag{position:absolute;top:12px;left:12px;background:white;color:var(--green);padding:7px 10px;border-radius:7px;font-size:12px;font-weight:bold}
+.heart{position:absolute;right:12px;top:10px;background:white;border-radius:50%;width:38px;height:38px;padding:0;font-size:20px;color:#c34e58}
+.details{padding:17px}
+.details h3{font-size:18px;margin-bottom:7px}
+.location{color:#718077;font-size:13px;margin-bottom:13px}
+.price{font-size:23px;font-weight:bold;color:var(--green)}
+.price small{font-size:12px;color:#718077;font-weight:normal}
+.features{display:flex;justify-content:space-between;gap:5px;border-top:1px solid #edf0ed;margin-top:14px;padding-top:13px;color:#637167;font-size:12px}
+.card-buttons{display:flex;gap:8px;margin-top:15px}
+.card-buttons button{flex:1;font-size:12px;padding:10px 5px}
+.empty{padding:35px;text-align:center;background:white;border-radius:12px;color:#718077;grid-column:1/-1}
+.panel{background:white;padding:24px;border-radius:15px;box-shadow:0 5px 20px #193e2810}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.panel h3{margin-bottom:15px;color:var(--dark)}
+.panel p{color:#66766c;font-size:14px;line-height:1.7}
+.panel button{margin-top:12px}
+#savedSearches,#visitList,#favList{margin-top:12px}
+.saved-item{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:12px 0;border-bottom:1px solid #edf0ed;font-size:13px}
+.saved-item button{margin:0;padding:8px}
+footer{margin-top:30px;background:#17352b;color:white;padding:35px 7%;text-align:center}
+footer p{margin-top:9px;color:#c4d5ca;font-size:13px}
+.modal{display:none;position:fixed;inset:0;background:#12251dc9;z-index:10;align-items:center;justify-content:center;padding:15px}
+.modal-box{background:white;padding:25px;border-radius:16px;width:100%;max-width:440px;max-height:90vh;overflow:auto}
+.modal-box h2{margin-bottom:12px}
+.modal-box input{margin-bottom:10px}
+.modal-actions{display:flex;gap:10px;margin-top:14px}
+.modal-actions button{flex:1}
+.close{float:right;background:#edf3ee;padding:6px 10px}
+#toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#17352b;color:white;padding:13px 20px;border-radius:10px;display:none;z-index:20}
+@media(max-width:850px){.hero-grid{grid-template-columns:1fr}.hero img{height:240px}.cards{grid-template-columns:repeat(2,minmax(0,1fr))}.filters{grid-template-columns:repeat(2,1fr)}nav{gap:9px}}
+@media(max-width:550px){header{padding:15px 5%;flex-wrap:wrap;gap:12px}nav{width:100%;justify-content:space-between;flex-wrap:wrap}nav a{font-size:12px}.hero{padding:40px 5%}.searchbox{margin:-15px 5% 20px;padding:16px}section{padding:25px 5%}.cards,.two-col{grid-template-columns:1fr}.filters{grid-template-columns:1fr 1fr}.hero img{height:200px}}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">Home<span>Finder.</span></div>
+  <nav>
+    <a href="#home">Home</a>
+    <a href="#properties">Properties</a>
+    <a href="#agents">Agents</a>
+    <a href="#tools">Tools</a>
+    <button class="primary" id="loginBtn" onclick="openLogin()">Login / Register</button>
+  </nav>
+</header>
+
+<div class="hero" id="home">
+  <div class="hero-grid">
+    <div>
+      <div class="eyebrow">YOUR NEXT CHAPTER STARTS HERE</div>
+      <h1>Find a place<br>to call <span>home.</span></h1>
+      <p>Explore beautiful homes, apartments and plots. Discover a place that fits your lifestyle and your budget.</p>
+      <div class="stats">
+        <div><strong id="propertyCount">6+</strong><small>Properties to explore</small></div>
+        <div><strong>Easy</strong><small>Property search</small></div>
+        <div><strong>24/7</strong><small>Browse anytime</small></div>
+      </div>
+    </div>
+    <img src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1000&q=85" alt="Beautiful modern house">
+  </div>
+</div>
+
+<div class="searchbox">
+  <h3>⌕ Find your perfect property</h3>
+  <div class="filters">
+    <div><label>LOCATION</label><input id="location" placeholder="e.g. Chennai"></div>
+    <div><label>PROPERTY TYPE</label>
+      <select id="type"><option value="">All types</option><option>House</option><option>Apartment</option><option>Plot</option><option>Commercial</option></select>
+    </div>
+    <div><label>MIN BUDGET (₹)</label><input id="minPrice" type="number" placeholder="No minimum"></div>
+    <div><label>MAX BUDGET (₹)</label><input id="maxPrice" type="number" placeholder="e.g. 8000000"></div>
+  </div>
+  <div class="filter-actions">
+    <button class="primary" onclick="searchProperties()">Search Properties</button>
+    <button class="secondary" onclick="saveSearch()">♡ Save Search Criteria</button>
+    <button class="secondary" onclick="loadSavedSearch()">↻ Use Saved Search</button>
+    <button class="secondary" onclick="resetSearch()">Reset</button>
+  </div>
+</div>
+
+<section id="properties">
+  <div class="section-head">
+    <div><h2>Explore properties</h2><p>Find your space, your way.</p></div>
+    <select id="sort" style="width:auto" onchange="renderProperties()">
+      <option value="default">Recommended</option>
+      <option value="low">Price: Low to High</option>
+      <option value="high">Price: High to Low</option>
+    </select>
+  </div>
+  <div class="cards" id="propertyCards"></div>
+</section>
+
+<section id="favorites">
+  <div class="section-head"><div><h2>♡ Your favorites</h2><p>Properties you want to remember.</p></div></div>
+  <div class="cards" id="favoriteCards"></div>
+</section>
+
+<section id="agents">
+  <div class="section-head"><div><h2>Meet our agents</h2><p>Connect with a property contact to ask questions or arrange a visit.</p></div></div>
+  <div class="cards">
+    <div class="panel"><h3>👩 Priya Sharma</h3><p>Residential property consultant</p><p>Speciality: Houses and apartments</p><button class="primary" onclick="contactAgent('Priya Sharma')">Contact Agent</button></div>
+    <div class="panel"><h3>👨 Arun Kumar</h3><p>Property and land consultant</p><p>Speciality: Plots and investment</p><button class="primary" onclick="contactAgent('Arun Kumar')">Contact Agent</button></div>
+    <div class="panel"><h3>🏢 HomeFinder Team</h3><p>Property assistance and listing enquiries</p><p>Email: demo@homefinder.example</p><button class="secondary" onclick="notify('This is a demonstration contact.')">View Details</button></div>
+  </div>
+</section>
+
+<section id="tools">
+  <div class="section-head"><div><h2>Your property dashboard</h2><p>Keep your searches and viewing plans together.</p></div></div>
+  <div class="two-col">
+    <div class="panel">
+      <h3>🔖 Saved search criteria</h3>
+      <p>Save your preferred location, property type and budget to reuse your search later.</p>
+      <div id="savedSearches"></div>
+    </div>
+    <div class="panel">
+      <h3>🗓 Property viewing requests</h3>
+      <p>Your demo property visit requests appear here.</p>
+      <div id="visitList"></div>
+    </div>
+    <div class="panel">
+      <h3>🏠 Mortgage calculator</h3>
+      <label>Property price (₹)</label><input id="loanPrice" type="number" value="5000000">
+      <label>Down payment (₹)</label><input id="downPayment" type="number" value="1000000">
+      <label>Annual interest rate (%)</label><input id="interest" type="number" value="8.5" step="0.1">
+      <label>Loan duration (years)</label><input id="years" type="number" value="20">
+      <button class="primary" onclick="calculateLoan()">Calculate EMI</button>
+      <h3 id="emiResult" style="margin-top:15px">Monthly EMI: —</h3>
+      <p>Illustrative estimate only. Actual loan terms vary by lender.</p>
+    </div>
+    <div class="panel">
+      <h3>📍 Explore locations</h3>
+      <p>Open Google Maps to explore an area or locate an individual property listing.</p>
+      <input id="mapLocation" placeholder="Enter area, city or landmark">
+      <button class="primary" onclick="openMap()">Explore on Google Maps ↗</button>
+      <p style="margin-top:12px">Map results are provided by Google Maps; property availability is not verified by this demo.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="panel">
+    <h3>📊 Website activity</h3>
+    <p id="activity">You have visited this website 1 time in this browser.</p>
+    <p>Demo activity is stored locally on this device.</p>
+  </div>
+</section>
+
+<footer>
+  <div class="logo" style="color:white">Home<span>Finder.</span></div>
+  <p>Discover your next home with confidence.</p>
+  <p>Internet Programming Lab Experiment · Home Finder</p>
+  <p>Demo website only — listings, prices, agents and contact information are sample data.</p>
+</footer>
+
+<div class="modal" id="modal">
+  <div class="modal-box">
+    <button class="close" onclick="closeModal()">✕</button>
+    <div id="modalContent"></div>
+  </div>
+</div>
+<div id="toast"></div>
+
+<script>
+const defaultProperties = [
+ {id:1,title:"Modern Family Villa",location:"Anna Nagar, Chennai",type:"House",price:8500000,beds:3,baths:3,area:1800,image:"https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=700&q=80",agent:"Priya Sharma",desc:"A spacious family home with a modern design.",lat:13.0850,lng:80.2101},
+ {id:2,title:"Cozy City Apartment",location:"Velachery, Chennai",type:"Apartment",price:4200000,beds:2,baths:2,area:1100,image:"https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=700&q=80",agent:"Priya Sharma",desc:"A comfortable apartment close to everyday amenities.",lat:12.9750,lng:80.2200},
+ {id:3,title:"Residential Green Plot",location:"Tambaram, Chennai",type:"Plot",price:2500000,beds:0,baths:0,area:1200,image:"https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=700&q=80",agent:"Arun Kumar",desc:"A sample residential plot listing for your search.",lat:12.9249,lng:80.1000},
+ {id:4,title:"Luxury Garden Home",location:"ECR, Chennai",type:"House",price:12500000,beds:4,baths:3,area:2400,image:"https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?auto=format&fit=crop&w=700&q=80",agent:"Priya Sharma",desc:"A spacious home with a contemporary design.",lat:12.9000,lng:80.2500},
+ {id:5,title:"Compact Studio Apartment",location:"Porur, Chennai",type:"Apartment",price:3000000,beds:1,baths:1,area:650,image:"https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?auto=format&fit=crop&w=700&q=80",agent:"Priya Sharma",desc:"A compact sample listing for first-time buyers.",lat:13.0358,lng:80.1560},
+ {id:6,title:"Commercial Shop Space",location:"T. Nagar, Chennai",type:"Commercial",price:6500000,beds:0,baths:1,area:900,image:"https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=700&q=80",agent:"Arun Kumar",desc:"A sample commercial property listing.",lat:13.0418,lng:80.2341}
+];
+
+let properties = JSON.parse(localStorage.getItem("hf_properties") || "null") || defaultProperties;
+let favorites = JSON.parse(localStorage.getItem("hf_favorites") || "[]");
+let visits = JSON.parse(localStorage.getItem("hf_visits") || "[]");
+let savedSearch = JSON.parse(localStorage.getItem("hf_search") || "null");
+let currentUser = JSON.parse(localStorage.getItem("hf_user") || "null");
+let activeFilters = {location:"",type:"",min:0,max:Infinity};
+
+function money(n){
+ if(n>=10000000)return "₹"+(n/10000000).toFixed(2).replace(/\.00$/,"")+" Cr";
+ if(n>=100000)return "₹"+(n/100000).toFixed(1).replace(/\.0$/,"")+" L";
+ return "₹"+n.toLocaleString("en-IN");
+}
+function persist(){
+ localStorage.setItem("hf_properties",JSON.stringify(properties));
+ localStorage.setItem("hf_favorites",JSON.stringify(favorites));
+ localStorage.setItem("hf_visits",JSON.stringify(visits));
+}
+function notify(msg){
+ const t=document.getElementById("toast");t.textContent=msg;t.style.display="block";
+ clearTimeout(window.toastTimer);window.toastTimer=setTimeout(()=>t.style.display="none",2600);
+}
+function filteredProperties(){
+ let list=properties.filter(p=>
+ p.location.toLowerCase().includes(activeFilters.location.toLowerCase()) &&
+ (!activeFilters.type||p.type===activeFilters.type) &&
+ p.price>=activeFilters.min && p.price<=activeFilters.max);
+ const sort=document.getElementById("sort").value;
+ if(sort==="low")list.sort((a,b)=>a.price-b.price);
+ if(sort==="high")list.sort((a,b)=>b.price-a.price);
+ return list;
+}
+function renderCard(p){
+ return `<article class="card">
+ <div class="photo"><img src="${p.image}" alt="${p.title}" onerror="this.src='https://placehold.co/600x400?text=Property'">
+ <span class="tag">${p.type}</span>
+ <button class="heart" title="Toggle favorite" onclick="toggleFavorite(${p.id})">${favorites.includes(p.id)?"♥":"♡"}</button></div>
+ <div class="details"><h3>${p.title}</h3><div class="location">📍 ${p.location}</div>
+ <div class="price">${money(p.price)} <small> / asking price</small></div>
+ <div class="features"><span>🛏 ${p.beds||"—"} Beds</span><span>🛁 ${p.baths||"—"} Baths</span><span>📐 ${p.area} sq.ft.</span></div>
+ <div class="card-buttons">
+ <button class="primary" onclick="showProperty(${p.id})">View Details</button>
+ <button class="secondary" onclick="openMapFor(${p.id})">📍 Map</button>
+ </div></div></article>`;
+}
+function renderProperties(){
+ const list=filteredProperties();
+ document.getElementById("propertyCards").innerHTML=list.length?list.map(renderCard).join(""):`<div class="empty">No matching properties found. Try changing your location or budget.</div>`;
+ document.getElementById("propertyCount").textContent=properties.length+"+";
+ renderFavorites();
+}
+function renderFavorites(){
+ const list=properties.filter(p=>favorites.includes(p.id));
+ document.getElementById("favoriteCards").innerHTML=list.length?list.map(renderCard).join(""):`<div class="empty">No favorites yet. Tap ♡ on any property to save it here.</div>`;
+}
+function searchProperties(){
+ activeFilters={
+ location:document.getElementById("location").value.trim(),
+ type:document.getElementById("type").value,
+ min:Number(document.getElementById("minPrice").value)||0,
+ max:Number(document.getElementById("maxPrice").value)||Infinity
+ };
+ renderProperties();
+ document.getElementById("properties").scrollIntoView({behavior:"smooth"});
+}
+function resetSearch(){
+ ["location","minPrice","maxPrice"].forEach(id=>document.getElementById(id).value="");
+ document.getElementById("type").value="";
+ activeFilters={location:"",type:"",min:0,max:Infinity};
+ renderProperties();
+}
+function saveSearch(){
+ savedSearch={
+ location:document.getElementById("location").value,
+ type:document.getElementById("type").value,
+ minPrice:document.getElementById("minPrice").value,
+ maxPrice:document.getElementById("maxPrice").value
+ };
+ localStorage.setItem("hf_search",JSON.stringify(savedSearch));
+ renderSavedSearch();
+ notify("Search criteria saved!");
+}
+function loadSavedSearch(){
+ if(!savedSearch){notify("Save your search criteria first.");return;}
+ Object.keys(savedSearch).forEach(k=>document.getElementById(k).value=savedSearch[k]);
+ searchProperties();
+ notify("Saved search loaded!");
+}
+function renderSavedSearch(){
+ document.getElementById("savedSearches").innerHTML=savedSearch?
+ `<div class="saved-item"><span>📍 ${savedSearch.location||"Any location"} · ${savedSearch.type||"All types"}<br>${savedSearch.minPrice?money(+savedSearch.minPrice):"No minimum"} – ${savedSearch.maxPrice?money(+savedSearch.maxPrice):"No maximum"}</span><button class="secondary" onclick="loadSavedSearch()">Use</button></div>`:
+ `<p>No saved search yet.</p>`;
+}
+function toggleFavorite(id){
+ favorites=favorites.includes(id)?favorites.filter(x=>x!==id):[...favorites,id];
+ persist();renderProperties();
+ notify(favorites.includes(id)?"Added to favorites":"Removed from favorites");
+}
+function openModal(html){
+ document.getElementById("modalContent").innerHTML=html;
+ document.getElementById("modal").style.display="flex";
+}
+function closeModal(){document.getElementById("modal").style.display="none";}
+function showProperty(id){
+ const p=properties.find(x=>x.id===id);if(!p)return;
+ openModal(`<h2>${p.title}</h2><img src="${p.image}" style="width:100%;height:180px;object-fit:cover;border-radius:10px;margin:12px 0">
+ <h3 style="color:var(--green)">${money(p.price)}</h3>
+ <p style="margin:10px 0">📍 ${p.location}</p><p>${p.desc}</p>
+ <p style="margin-top:10px">Type: ${p.type} · ${p.area} sq.ft. · ${p.beds||"—"} beds · ${p.baths||"—"} baths</p>
+ <p style="margin-top:10px">Contact: ${p.agent}</p>
+ <div class="modal-actions"><button class="primary" onclick="bookVisit(${p.id})">Request Viewing</button><button class="secondary" onclick="openMapFor(${p.id})">Google Maps</button></div>`);
+}
+function bookVisit(id){
+ if(!currentUser){notify("Please log in to request a viewing.");openLogin();return;}
+ const p=properties.find(x=>x.id===id);
+ const today=new Date().toISOString().slice(0,10);
+ openModal(`<h2>Request a viewing</h2><p>${p.title} — ${p.location}</p>
+ <label>Preferred date</label><input id="visitDate" type="date" min="${today}" value="${today}">
+ <label>Contact phone</label><input id="visitPhone" placeholder="Enter your phone number">
+ <div class="modal-actions"><button class="primary" onclick="confirmVisit(${p.id})">Submit Request</button><button class="secondary" onclick="closeModal()">Cancel</button></div>`);
+}
+function confirmVisit(id){
+ const date=document.getElementById("visitDate").value;
+ const phone=document.getElementById("visitPhone").value.trim();
+ if(!date||!phone){notify("Please enter the date and phone number.");return;}
+ visits.push({id,date,phone,user:currentUser.email});
+ localStorage.setItem("hf_visits",JSON.stringify(visits));
+ renderVisits();closeModal();notify("Demo viewing request saved.");
+}
+function renderVisits(){
+ const own=visits.filter(v=>currentUser&&v.user===currentUser.email);
+ document.getElementById("visitList").innerHTML=own.length?own.map(v=>{
+ const p=properties.find(x=>x.id===v.id);
+ return `<div class="saved-item"><span>${p?p.title:"Property"}<br>📅 ${v.date}</span><button class="secondary" onclick="cancelVisit('${v.date}',${v.id})">Cancel</button></div>`;
+ }).join(""):`<p>No viewing requests yet. Log in and request a property viewing.`;
+}
+function cancelVisit(date,id){
+ visits=visits.filter(v=>!(v.date===date&&v.id===id&&currentUser&&v.user===currentUser.email));
+ localStorage.setItem("hf_visits",JSON.stringify(visits));renderVisits();notify("Viewing request removed.");
+}
+function openMapFor(id){
+ const p=properties.find(x=>x.id===id);if(!p)return;
+ window.open("https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(p.title+" "+p.location)," _blank");
+}
+function openMap(){
+ const loc=document.getElementById("mapLocation").value.trim();
+ if(!loc){notify("Enter a location first.");return;}
+ window.open("https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(loc),"_blank");
+}
+function contactAgent(name){
+ openModal(`<h2>Contact ${name}</h2><p>Send an enquiry about a property.</p>
+ <label>Your name</label><input id="agentName" value="${currentUser?currentUser.name:""}" placeholder="Full name">
+ <label>Your email</label><input id="agentEmail" value="${currentUser?currentUser.email:""}" placeholder="Email address">
+ <label>Message</label><input id="agentMessage" placeholder="I am interested in a property...">
+ <div class="modal-actions"><button class="primary" onclick="sendEnquiry('${name}')">Save Enquiry</button><button class="secondary" onclick="closeModal()">Cancel</button></div>`);
+}
+function sendEnquiry(agent){
+ const name=document.getElementById("agentName").value.trim();
+ const email=document.getElementById("agentEmail").value.trim();
+ const message=document.getElementById("agentMessage").value.trim();
+ if(!name||!email||!message){notify("Please fill in all fields.");return;}
+ const arr=JSON.parse(localStorage.getItem("hf_enquiries")||"[]");
+ arr.push({agent,name,email,message,date:new Date().toLocaleString()});
+ localStorage.setItem("hf_enquiries",JSON.stringify(arr));
+ closeModal();notify("Enquiry saved in this browser demo.");
+}
+function openLogin(){
+ openModal(`<h2>Welcome to HomeFinder</h2><p>Sign in or create a demo buyer account.</p>
+ <label>Full name (for registration)</label><input id="authName" placeholder="Your name">
+ <label>Email</label><input id="authEmail" type="email" placeholder="you@example.com">
+ <label>Password</label><input id="authPassword" type="password" placeholder="At least 6 characters">
+ <div class="modal-actions"><button class="primary" onclick="registerUser()">Register</button><button class="secondary" onclick="loginUser()">Login</button></div>
+ <p style="margin-top:12px;font-size:12px">Demo only: credentials are stored locally and are not secure for real users.</p>`);
+}
+function registerUser(){
+ const name=document.getElementById("authName").value.trim();
+ const email=document.getElementById("authEmail").value.trim().toLowerCase();
+ const password=document.getElementById("authPassword").value;
+ if(!name||!email||password.length<6){notify("Enter your name, valid email and password (6+ characters).");return;}
+ const users=JSON.parse(localStorage.getItem("hf_users")||"[]");
+ if(users.some(u=>u.email===email)){notify("Account already exists. Please log in.");return;}
+ users.push({name,email,password});
+ localStorage.setItem("hf_users",JSON.stringify(users));
+ currentUser={name,email};localStorage.setItem("hf_user",JSON.stringify(currentUser));
+ updateLogin();closeModal();renderVisits();notify("Demo account created. Welcome!");
+}
+function loginUser(){
+ const email=document.getElementById("authEmail").value.trim().toLowerCase();
+ const password=document.getElementById("authPassword").value;
+ const users=JSON.parse(localStorage.getItem("hf_users")||"[]");
+ const user=users.find(u=>u.email===email&&u.password===password);
+ if(!user){notify("Account not found or password incorrect.");return;}
+ currentUser={name:user.name,email:user.email};
+ localStorage.setItem("hf_user",JSON.stringify(currentUser));
+ updateLogin();closeModal();renderVisits();notify("Login successful!");
+}
+function updateLogin(){
+ document.getElementById("loginBtn").textContent=currentUser?"Logout":"Login / Register";
+ document.getElementById("loginBtn").onclick=currentUser?logout:openLogin;
+}
+function logout(){
+ currentUser=null;localStorage.removeItem("hf_user");updateLogin();renderVisits();notify("Logged out.");
+}
+function calculateLoan(){
+ const price=Number(document.getElementById("loanPrice").value);
+ const down=Number(document.getElementById("downPayment").value);
+ const rate=Number(document.getElementById("interest").value)/1200;
+ const months=Number(document.getElementById("years").value)*12;
+ const principal=price-down;
+ if(price<=0||down<0||down>=price||months<=0||rate<0){notify("Enter valid loan details.");return;}
+ const emi=rate===0?principal/months:principal*rate*Math.pow(1+rate,months)/(Math.pow(1+rate,months)-1);
+ document.getElementById("emiResult").textContent="Monthly EMI: "+money(Math.round(emi));
+}
+function recordVisit(){
+ let count=Number(localStorage.getItem("hf_page_visits")||0)+1;
+ localStorage.setItem("hf_page_visits",count);
+ document.getElementById("activity").textContent="This website has been opened "+count+" time(s) in this browser.";
+}
+document.getElementById("modal").addEventListener("click",e=>{if(e.target.id==="modal")closeModal();});
+renderProperties();renderSavedSearch();renderVisits();updateLogin();recordVisit();
+</script>
+</body>
+</html>

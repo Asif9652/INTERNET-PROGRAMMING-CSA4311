@@ -1,0 +1,151 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>InsureEasy</title>
+    <style>
+        body {
+            font-family: Arial;
+            background: #eef5ff;
+            text-align: center;
+            padding: 20px;
+        }
+        .box {
+            background: white;
+            padding: 20px;
+            margin: 15px auto;
+            max-width: 350px;
+            border-radius: 12px;
+            box-shadow: 0 3px 10px #ccc;
+        }
+        input, select, button {
+            padding: 10px;
+            margin: 6px;
+            width: 90%;
+            box-sizing: border-box;
+        }
+        button {
+            background: #176b52;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        h1 { color: #176b52; }
+    </style>
+</head>
+<body>
+
+<h1>InsureEasy</h1>
+<p>Online Insurance Management System</p>
+
+<div class="box">
+    <h3>User / Agent Login</h3>
+    <input id="username" placeholder="Enter username">
+    <input id="password" type="password" placeholder="Enter password">
+    <button onclick="login()">Login</button>
+    <p id="loginResult"></p>
+</div>
+
+<div class="box">
+    <h3>Compare Insurance Policies</h3>
+    <select id="policy">
+        <option value="Health Insurance">Health Insurance</option>
+        <option value="Auto Insurance">Auto Insurance</option>
+        <option value="Home Insurance">Home Insurance</option>
+    </select>
+    <button onclick="showPolicy()">View Policy</button>
+    <p id="policyResult"></p>
+</div>
+
+<div class="box">
+    <h3>Manage Policy</h3>
+    <input id="customer" placeholder="Customer name">
+    <input id="dueDate" type="date">
+    <input id="premium" type="number" placeholder="Premium amount">
+    <button onclick="savePolicy()">Save Policy</button>
+    <p id="savedResult"></p>
+</div>
+
+<div class="box">
+    <h3>Policy Due Reminder</h3>
+    <button onclick="checkReminder()">Check Due Date</button>
+    <p id="reminder"></p>
+</div>
+
+<script>
+    function login() {
+        let user = document.getElementById("username").value;
+        let pass = document.getElementById("password").value;
+
+        if (user === "" || pass === "") {
+            document.getElementById("loginResult").innerText =
+                "Please enter username and password.";
+        } else {
+            document.getElementById("loginResult").innerText =
+                "Demo login successful for " + user;
+        }
+    }
+
+    function showPolicy() {
+        let policy = document.getElementById("policy").value;
+        let details = {
+            "Health Insurance": "Covers eligible medical expenses.",
+            "Auto Insurance": "Provides cover for eligible vehicle-related risks.",
+            "Home Insurance": "Helps protect your home against covered risks."
+        };
+
+        document.getElementById("policyResult").innerText =
+            policy + ": " + details[policy];
+    }
+
+    function savePolicy() {
+        let name = document.getElementById("customer").value;
+        let date = document.getElementById("dueDate").value;
+        let premium = document.getElementById("premium").value;
+
+        if (name === "" || date === "" || premium === "" ||
+            Number(premium) <= 0) {
+            alert("Please enter valid policy details.");
+            return;
+        }
+
+        let policy = {name: name, date: date, premium: premium};
+        localStorage.setItem("insurancePolicy", JSON.stringify(policy));
+
+        document.getElementById("savedResult").innerText =
+            "Policy saved for " + name +
+            ". Premium: ₹" + premium;
+    }
+
+    function checkReminder() {
+        let data = localStorage.getItem("insurancePolicy");
+
+        if (!data) {
+            document.getElementById("reminder").innerText =
+                "Please save a policy first.";
+            return;
+        }
+
+        let policy = JSON.parse(data);
+        let today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        let due = new Date(policy.date + "T00:00:00");
+        let days = Math.ceil((due - today) / (1000 * 60 * 60 * 24));
+
+        if (days < 0) {
+            document.getElementById("reminder").innerText =
+                "Policy premium is overdue!";
+        } else if (days <= 7) {
+            document.getElementById("reminder").innerText =
+                "Reminder: Premium due in " + days + " day(s).";
+        } else {
+            document.getElementById("reminder").innerText =
+                "No immediate reminder. Due in " + days + " days.";
+        }
+    }
+</script>
+
+</body>
+</html>

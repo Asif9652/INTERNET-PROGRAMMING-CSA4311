@@ -1,0 +1,133 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>ReNewMarket</title>
+    <style>
+        body {
+            font-family: Arial;
+            background: #eef7f0;
+            text-align: center;
+            padding: 20px;
+        }
+        h1 { color: #176b52; }
+        .box {
+            background: white;
+            padding: 18px;
+            margin: 15px auto;
+            max-width: 350px;
+            border-radius: 12px;
+            box-shadow: 0 3px 10px #ccc;
+        }
+        input, select, button {
+            padding: 10px;
+            margin: 6px;
+            width: 90%;
+            box-sizing: border-box;
+        }
+        button {
+            background: #176b52;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<h1>♻ ReNewMarket</h1>
+<p>Buy and Sell Pre-Loved Products</p>
+
+<div class="box">
+    <h3>Add Product</h3>
+    <input id="name" placeholder="Product Name">
+    <select id="category">
+        <option>Electronics</option>
+        <option>Furniture</option>
+        <option>Clothing</option>
+        <option>Collectibles</option>
+    </select>
+    <input id="price" type="number" placeholder="Price in ₹">
+    <button onclick="addProduct()">Add Listing</button>
+</div>
+
+<div class="box">
+    <h3>Available Products</h3>
+    <input id="search" placeholder="Search products..."
+           oninput="displayProducts()">
+    <ul id="products"></ul>
+</div>
+
+<div class="box">
+    <h3>Order Management</h3>
+    <select id="status">
+        <option>Shipped</option>
+        <option>Received</option>
+    </select>
+    <button onclick="updateStatus()">Update Order Status</button>
+    <p id="orderStatus">Status: Pending</p>
+    <button onclick="deleteOrder()">Delete Order</button>
+</div>
+
+<script>
+    let items = [];
+    let status = "Pending";
+
+    function addProduct() {
+        let name = document.getElementById("name").value.trim();
+        let category = document.getElementById("category").value;
+        let price = Number(document.getElementById("price").value);
+
+        if (name === "" || price <= 0) {
+            alert("Enter a product name and valid price.");
+            return;
+        }
+
+        items.push({name, category, price});
+        document.getElementById("name").value = "";
+        document.getElementById("price").value = "";
+        displayProducts();
+    }
+
+    function displayProducts() {
+        let search = document.getElementById("search").value.toLowerCase();
+        let list = document.getElementById("products");
+        list.innerHTML = "";
+
+        items.filter(item =>
+            item.name.toLowerCase().includes(search) ||
+            item.category.toLowerCase().includes(search)
+        ).forEach((item, index) => {
+            let li = document.createElement("li");
+            li.textContent = item.name + " (" + item.category +
+                ") - ₹" + item.price + " ";
+
+            let btn = document.createElement("button");
+            btn.textContent = "Delete";
+            btn.style.width = "auto";
+            btn.onclick = function() {
+                items.splice(index, 1);
+                displayProducts();
+            };
+
+            li.appendChild(btn);
+            list.appendChild(li);
+        });
+    }
+
+    function updateStatus() {
+        status = document.getElementById("status").value;
+        document.getElementById("orderStatus").innerText =
+            "Status: " + status;
+    }
+
+    function deleteOrder() {
+        status = "Deleted";
+        document.getElementById("orderStatus").innerText =
+            "Order has been deleted.";
+    }
+</script>
+
+</body>
+</html>
